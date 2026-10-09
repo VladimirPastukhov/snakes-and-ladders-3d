@@ -29,10 +29,10 @@
 
 ## 6. Pipelines
 
-- [ ] 6.1 Add `.github/workflows/ci.yml` (pull requests and pushes to `main`: install, lint, format check, typecheck, test, build); verify a PR shows the check passing
-- [ ] 6.2 Add `.github/workflows/deploy.yml` (push to `main`, `concurrency` group `deploy-production` without cancelling: checks, build, `wrangler deploy --var VERSION:$GITHUB_SHA`, then `pnpm smoke` with `BASE_URL` from a repo variable and `EXPECTED_VERSION=$GITHUB_SHA`); verify the first run deploys and prints the `*.workers.dev` URL (its smoke step is expected to fail until 6.3 sets the URL)
-- [ ] 6.3 Store the production URL as repository variable `PRODUCTION_URL` and re-run the deploy; verify the smoke step passes against production
-- [ ] 6.4 User enables branch protection on `main` (require PR, require the CI check, no direct pushes, including admins); verify a direct `git push` to `main` is rejected
+- [x] 6.1 Add `.github/workflows/ci.yml` (pull requests and pushes to `main`: install, lint, format check, typecheck, test, build); verify a PR shows the check passing
+- [x] 6.2 Add `.github/workflows/deploy.yml` (push to `main`, `concurrency` group `deploy-production` without cancelling: checks, build, `wrangler deploy --var VERSION:$GITHUB_SHA`, then `pnpm smoke` with `BASE_URL` from a repo variable and `EXPECTED_VERSION=$GITHUB_SHA`); verify the first run deploys and prints the `*.workers.dev` URL (its smoke step is expected to fail until 6.3 sets the URL)
+- [x] 6.3 Store the production URL as repository variable `PRODUCTION_URL` and re-run the deploy; verify the smoke step passes against production
+- [x] 6.4 User enables branch protection on `main` (require PR, require the CI check, no direct pushes, including admins); verify a direct `git push` to `main` is rejected
 
 ## 7. Documentation
 
@@ -40,7 +40,7 @@
 
 ## 8. End-to-end acceptance
 
-- [ ] 8.1 Open a PR with a deliberate type error; verify CI fails and the merge button is blocked, then close the PR
+- [x] 8.1 Open a PR with a deliberate type error; verify CI fails and the merge button is blocked, then close the PR
 - [ ] 8.2 Merge a PR that changes the placeholder page text; verify within 10 minutes production shows the new text, `/api/health` reports the merge commit, and the deploy run (including smoke test) is green
 - [ ] 8.3 Open production on a phone; verify the page loads over HTTPS and `/m/K7QX` shows the game page
 
