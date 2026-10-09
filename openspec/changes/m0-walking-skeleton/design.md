@@ -23,7 +23,8 @@ pnpm workspaces with `client/`, `server/`, `shared/`, `e2e/`. Root `package.json
 *Alternative:* Turborepo/Nx. Rejected: four packages don't need a task graph or caching.
 
 ### One Worker serves assets and API
-`server/wrangler.jsonc` points `assets.directory` at `../client/dist`, sets `not_found_handling: "single-page-application"` so deep links return `index.html`, and `run_worker_first: ["/api/*"]` so API paths always reach the Worker (and unknown ones get a JSON 404 instead of the page). Cloudflare applies the SPA fallback to browser navigation requests (`Sec-Fetch-Mode: navigate`); other requests for missing files fall through to the Worker, which answers 404. The exact fallback rules for requests without that header are verified in the smoke test rather than assumed. This is the setup ADR 0001 assumes, so M2 only adds a Durable Object binding.
+`server/wrangler.jsonc` points `assets.directory` at `../client/dist` with `not_found_handling: "none"` and `run_worker_first: ["/api/*"]`. Files that exist are served directly by Cloudflare without running the Worker. Every other request reaches the Worker, which routes it explicitly: `/api/*` to the API (JSON 404 when unknown), a GET for a path that does not look like a file (no extension in its last segment, e.g. `/m/K7QX`) to the game page via the `ASSETS` binding, and anything else to a 404. This is the setup ADR 0001 assumes, so M2 only adds a Durable Object binding.
+*Rejected during implementation:* `not_found_handling: "single-page-application"`. Checked against `wrangler dev`, it returned the game page with HTTP 200 for missing files such as `/assets/missing.js` even for non-navigation requests, which breaks the app-hosting spec.
 *Alternative:* client on Cloudflare Pages, Worker separately. Rejected: two deploys and cross-origin WebSockets later.
 
 ### Build version
@@ -34,7 +35,7 @@ CI passes the commit SHA to the deploy as a Worker variable (`wrangler deploy --
 *Alternative:* `@cloudflare/vite-plugin`, which runs the Worker inside Vite's dev server. Worth revisiting in M2 when WebSockets arrive; not needed for one endpoint.
 
 ### Tooling
-TypeScript in strict mode, ESLint (flat config, typescript-eslint), Prettier, Vitest. Server tests use `@cloudflare/vitest-pool-workers`, so `/api/health` is tested in the real Workers runtime. Node LTS version pinned in `.nvmrc` and `packageManager` in the root `package.json`, so CI and laptops use the same versions.
+TypeScript in strict mode, ESLint (flat config, typescript-eslint), Prettier, Vitest. Server tests use `@cloudflare/vitest-plugin` (the renamed `@cloudflare/vitest-pool-workers`), so `/api/health` is tested in the real Workers runtime. Node LTS version pinned in `.nvmrc` and `packageManager` in the root `package.json`, so CI and laptops use the same versions.
 
 ### CI/CD on GitHub Actions
 - `ci.yml` runs on pull requests (and on pushes to `main`): install, lint, format check, typecheck, test, build. Its job is the required status check in branch protection.

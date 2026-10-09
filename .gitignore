@@ -63,3 +63,8 @@ Desktop.ini
 # Claude Code — keep shared commands/skills, ignore personal settings
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Cloudflare Wrangler
+.wrangler/
+.dev.vars*
+!.dev.vars.example

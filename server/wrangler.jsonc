@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "snakes-and-ladders-3d",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  // Existing files are served directly; every other request reaches the Worker,
+  // which decides between the game page (deep links) and a 404.
+  "assets": {
+    "directory": "../client/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    "run_worker_first": ["/api/*"],
+  },
+  "vars": {
+    // Overridden by CI with the deployed commit SHA: wrangler deploy --var VERSION:<sha>
+    "VERSION": "dev",
+  },
+  "observability": {
+    "enabled": true,
+  },
+}
