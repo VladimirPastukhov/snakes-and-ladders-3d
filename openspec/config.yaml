@@ -1,5 +1,45 @@
 schema: spec-driven
 
+context: |
+  Online 2-player 3D Snakes & Ladders in the browser, themed as the Yellow Brick Road
+  from the 1900 book "The Wonderful Wizard of Oz". Hobby scale: friends, <=10 concurrent Matches.
+  Domain vocabulary: GLOSSARY.md (use its terms exactly). Decisions: docs/adr/.
+
+  Constraints:
+  - Cost: target $0/month, hard cap ~$5/month. Free *.workers.dev subdomain, no custom domain yet.
+  - Art must derive from the public-domain book / Denslow illustrations, never the 1939 MGM film
+    (no ruby slippers, film character designs, green witch, songs). Scenery: CC0 packs (Kenney, Quaternius) or code.
+  - Desktop first, but must be playable on a phone in portrait.
+  - Stack: TypeScript everywhere; pnpm workspaces (client, server, shared); Vite + React Three Fiber/drei client;
+    Vitest; ESLint + Prettier.
+  - Platform (ADR 0001): Cloudflare Worker serves the static client; one Durable Object per Match (keyed by
+    Match Code), SQLite storage, alarms for timers. No other database.
+  - Server-authoritative: the Current Player presses Roll (button, or Space/Enter on desktop); the server
+    generates the number with crypto.getRandomValues. Server does not wait for client animations.
+  - Rules are pure functions in shared/ with the Roll injected (e.g. takeTurn(match, roll) -> { match, events }).
+    Rules code never mentions the Oz theme; Event Names and Regions are presentation data.
+  - Protocol: plain WebSocket, JSON; message types as discriminated unions in shared/, zod-validated on the
+    server; every server message = event + full Match snapshot.
+  - Identity: anonymous display name (1-20 chars) + random session token in localStorage. No accounts.
+  - Board: 30 Cells on a winding road. Ladders 3->11 (Witch of the North's kiss), 16->23 (log bridge),
+    24->29 (field mice). Snakes 18->8 (Kalidahs), 22->13 (river current), 27->19 (deadly poppies).
+    Tokens start at cell 0; reaching or passing 30 wins. One die, no variant rules, Tokens may share a Cell.
+    Server picks first player randomly. Creator = Dorothy (with Toto), joiner = Scarecrow.
+  - Lifecycle: Match Code = 5 chars, no look-alike characters. Waiting Match expires after 1h; a Player
+    absent 5 min -> Abandoned (no Winner); no turn timer. Third visitor sees "Match full"; newest tab takes
+    the seat. Rematch = request/accept -> new Match. Finished/Abandoned Matches deleted after 7 days.
+  - Delivery: public GitHub repo; Actions run lint, typecheck, tests on every PR (red blocks merge);
+    merge to main auto-deploys to production; Playwright smoke test runs against production after each deploy.
+
+  Milestones (one OpenSpec change each, proposed only when the milestone starts):
+  M0 walking skeleton & pipeline, M1 road board (no networking), M2 match system, M3 game rules,
+  M4 game feel (dice tumble, cell-by-cell hops, generic jump arcs, follow camera), M5 Oz art pass (set pieces, character Tokens, themed jump per event), M6 lifecycle
+  (timers, Rematch, opened-elsewhere, survive redeploy), M7 polish (optional).
+  A milestone is done only when deployed by the pipeline, CI is green, and the post-deploy smoke test
+  passes, plus its own acceptance criteria.
+
+  The user is learning OpenSpec: explain the purpose of artifacts and sections when they first appear.
+
 # Project context (optional)
 # Add only constraints that should guide OpenSpec artifacts and workflows.
 # Include constraints an agent cannot infer by reading the code.
