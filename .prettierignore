@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+openspec/
+.claude/
+**/dist/
+**/.wrangler/
+**/worker-configuration.d.ts
+playwright-report/
+test-results/
+docs/prompts/

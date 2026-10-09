@@ -1,0 +1,12 @@
+packages:
+  - client
+  - server
+  - shared
+  - e2e
+minimumReleaseAgeExclude:
+  - "@cloudflare/vitest-plugin@1.4.0"
+  - miniflare@5.20261006.1-alpha
+  - wrangler@4.149.0
+allowBuilds:
+  esbuild: true
+  workerd: true
