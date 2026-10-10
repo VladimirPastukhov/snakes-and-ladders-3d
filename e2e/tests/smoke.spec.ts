@@ -22,6 +22,12 @@ test("game page loads with title and version", async ({ page }) => {
   await expect(page.getByText(`Version: ${expectedVersion}`)).toBeVisible();
 });
 
+test("the 3D Board finishes drawing", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('[data-board-ready="true"]')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});
+
 test("a Match-style deep link loads the game page", async ({ page }) => {
   const response = await page.goto("/m/K7QX");
   expect(response?.status()).toBe(200);

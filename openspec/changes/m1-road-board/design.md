@@ -30,7 +30,8 @@ Unit tests on the returned numbers enforce the spec: consecutive Cells are an ev
 ### Drawing the scene with React Three Fiber
 - **Canvas:** `frameloop="demand"` (draws only after input or resize, which saves phone battery), device pixel ratio capped at 2, no shadows, no post-processing.
 - **Ground:** each Region is a set of flat discs centred under its Cells in the Region's colour, sitting slightly above a neutral base plane. Overlapping discs of one colour read as a soft organic patch, with no polygon maths needed.
-- **Cells:** a yellow box slab per Cell, rotated to the road tangent, with its number from drei `<Text>` lying on top.
+- **Cells:** a round, low-poly yellow slab (a short cylinder, like a flagstone) per Cell, with its number from drei `<Text>` lying on top, turned to read along the road.
+  *Changed during implementation:* square slabs turned to the road clipped each other's corners at the hairpin turns (caught by the overlap test). Shrinking them enough made the Cells too small to read, and round slabs have no corners to clip.
 - **Snakes and Ladders:** a tube along a quadratic Bézier from the start Cell to the end Cell, arching higher for longer jumps, with a cone at the destination. A `toneMapped={false}` unlit material in a bright colour gives the "glow" without bloom. Ladders are cyan and Snakes magenta: distinct for the common colour-vision deficiencies and different from the yellow road.
 - **Event Names:** each arc has pointer handlers. Hovering (mouse) or tapping (touch) sets it as selected and shows a drei `<Html>` label at the top of its arch. Tapping empty space clears it.
 - **Tokens:** a low-poly pawn (cylinder plus sphere) in Okabe–Ito orange (creator) and blue (joiner), placed either side of the Start position.
@@ -57,7 +58,7 @@ GitHub's runners have no GPU, and current Chrome no longer falls back to softwar
 
 ## Risks / Trade-offs
 
-- [Client bundle grows by about 200 KB gzipped (three.js, R3F, drei)] → Acceptable for a game; drei is imported per component so unused parts are tree-shaken. Checked against the build output during apply.
+- [Client bundle grows to about 360 KB gzipped, from 69 KB] → Measured during apply; the earlier estimate of +200 KB was wrong. React Three Fiber imports all of three.js so any three.js class can be used as a JSX element, which defeats tree-shaking; drei itself adds only about 5 KB. Accepted for a game (about one extra second on 4G). Shrinking it substantially would mean dropping React Three Fiber, which reverses the stack decision; revisit only if load time becomes a real complaint.
 - [The road looks wrong even though the geometry tests pass] → Screenshots at 390 × 844 and 1440 × 900 are reviewed during apply, and the owner checks on their phone before merging.
 - [Tap targets on thin arcs are hard to hit on a phone] → Each arc gets an invisible, thicker tube used only for pointer hits.
 - [Software WebGL in CI is slow] → The smoke test only waits for the first frame; nothing animates.

@@ -15,7 +15,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm --filter !e2e -r test",
     "smoke": "pnpm --filter e2e smoke",
-    "deploy": "pnpm build && pnpm --filter server deploy"
+    "deploy": "pnpm build && pnpm --filter server deploy",
+    "visual": "pnpm --filter e2e visual"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -68,3 +68,6 @@ CLAUDE.local.md
 .wrangler/
 .dev.vars*
 !.dev.vars.example
+
+# Visual check screenshots (pnpm visual)
+visual-output/

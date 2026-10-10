@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "smoke": "playwright test",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "visual": "playwright test --config playwright.visual.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
