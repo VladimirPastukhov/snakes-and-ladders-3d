@@ -41,8 +41,8 @@
 ## 8. End-to-end acceptance
 
 - [x] 8.1 Open a PR with a deliberate type error; verify CI fails and the merge button is blocked, then close the PR
-- [ ] 8.2 Merge a PR that changes the placeholder page text; verify within 10 minutes production shows the new text, `/api/health` reports the merge commit, and the deploy run (including smoke test) is green
-- [ ] 8.3 Open production on a phone; verify the page loads over HTTPS and `/m/K7QX` shows the game page
+- [x] 8.2 Merge a PR that changes the placeholder page text; verify within 10 minutes production shows the new text, `/api/health` reports the merge commit, and the deploy run (including smoke test) is green
+- [x] 8.3 Open production on a phone; verify the page loads over HTTPS and `/m/K7QX` shows the game page
 
 ## Workflow follow-up
 
