@@ -7,14 +7,14 @@ Production currently shows a text placeholder. Every later milestone (Match syst
 ## What Changes
 
 - Add the single definition of the Board to the shared code: 30 Cells, Start (cell 0), the Final Cell, and the six Snakes and Ladders with their cells. The future rules engine and the 3D view both read it.
-- Add the Oz presentation data next to the view: the Regions (which Cells belong to which story Region) and the Event Name of each Snake and Ladder. The rules definition stays theme-free.
+- Add the Oz presentation data next to the view: the Regions (which Cells belong to which story Region) and their colours. The rules definition stays theme-free.
 - Replace the text placeholder with a full-screen 3D diorama: a winding yellow-brick road from Dorothy's farmhouse (placeholder block) at Start to the Emerald City (placeholder block) at the Final Cell, with 30 numbered Cells, Regions as coloured ground zones, and each Snake and Ladder drawn as a glowing arc from its start Cell to its end Cell.
 - Place both Tokens (placeholder pieces in the two Player colours) at Start.
 - Add a camera that frames the whole Board in portrait and landscape and allows limited orbit and zoom, by mouse or touch.
 - Keep the game title and build version visible on top of the scene, and show a plain message instead of a blank page when the browser cannot do 3D.
 - Extend the post-deploy smoke test so production must actually render the Board.
 
-Out of scope: Matches, networking, Rolls and Moves, animation, camera following, character models, scenery and themed set pieces (M5), sound.
+Out of scope: showing Event Names (removed during review as redundant), Matches, networking, Rolls and Moves, animation, camera following, character models, scenery and themed set pieces (M5), sound.
 
 ## Capabilities
 

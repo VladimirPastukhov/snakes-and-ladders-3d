@@ -1,6 +1,6 @@
-import { CELL_COUNT, JUMPS } from "@sl/shared";
+import { CELL_COUNT } from "@sl/shared";
 import { describe, expect, it } from "vitest";
-import { EVENT_NAMES, REGIONS, regionOf } from "./oz";
+import { REGIONS, regionOf } from "./oz";
 
 describe("Oz Regions", () => {
   it("put every Cell 1–30 in exactly one Region", () => {
@@ -29,14 +29,5 @@ describe("Oz Regions", () => {
   it("give neighbouring Regions different ground colours", () => {
     expect(regionOf(5)?.groundColor).not.toBe(regionOf(6)?.groundColor);
     expect(new Set(REGIONS.map((r) => r.groundColor)).size).toBe(REGIONS.length);
-  });
-});
-
-describe("Event Names", () => {
-  it("name every Snake and Ladder, and nothing else", () => {
-    expect(Object.keys(EVENT_NAMES).map(Number).sort()).toEqual(
-      JUMPS.map((jump) => jump.from).sort(),
-    );
-    expect(EVENT_NAMES[27]).toBe("Deadly Poppies");
   });
 });

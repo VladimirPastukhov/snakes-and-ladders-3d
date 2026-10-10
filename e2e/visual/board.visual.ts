@@ -3,8 +3,6 @@ import { expect, test, type Page } from "@playwright/test";
 // Mirrors the shape of `window.__board` (client/src/board/debug.tsx); only the fields used here.
 interface BoardDebug {
   cells: { cell: number; onScreen: boolean }[];
-  arcs: { from: number; x: number; y: number }[];
-  selectedEventName: string | null;
 }
 
 const VIEWPORTS = [
@@ -31,15 +29,6 @@ for (const viewport of VIEWPORTS) {
       expect(cells).toHaveLength(30);
       expect(cells.filter((c) => !c.onScreen).map((c) => c.cell)).toEqual([]);
       await page.screenshot({ path: `visual-output/${viewport.name}.png` });
-    });
-
-    test("names the Deadly Poppies on hover", async ({ page }) => {
-      await openBoard(page);
-      const poppies = (await board(page)).arcs.find((arc) => arc.from === 27)!;
-      await page.mouse.move(poppies.x, poppies.y);
-      await expect(page.locator(".event-label", { hasText: "Deadly Poppies" })).toBeVisible();
-      await expect.poll(async () => (await board(page)).selectedEventName).toBe("Deadly Poppies");
-      await page.screenshot({ path: `visual-output/${viewport.name}-poppies.png` });
     });
   });
 }

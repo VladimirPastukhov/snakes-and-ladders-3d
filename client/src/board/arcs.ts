@@ -30,7 +30,7 @@ export function buildArcs(road: Road): JumpArc[] {
   });
 }
 
-/** Highest point of an arc: where its Event Name label is shown. */
+/** Highest point of an arc. */
 export function arcTop(arc: JumpArc): Vector3 {
   return arc.curve.getPoint(0.5);
 }

@@ -85,17 +85,11 @@ function ReadySignal({ onReady }: { onReady: () => void }) {
 export function BoardScene() {
   const road = useMemo(() => buildRoad(), []);
   const arcs: JumpArc[] = useMemo(() => buildArcs(road), [road]);
-  const [selected, setSelected] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
 
   return (
     <div className="board" data-board-ready={ready ? "true" : undefined}>
-      <Canvas
-        frameloop="demand"
-        dpr={[1, 2]}
-        camera={{ fov: CAMERA_FOV, near: 0.1, far: 500 }}
-        onPointerMissed={() => setSelected(null)}
-      >
+      <Canvas frameloop="demand" dpr={[1, 2]} camera={{ fov: CAMERA_FOV, near: 0.1, far: 500 }}>
         <color attach="background" args={["#bfe3f2"]} />
         <hemisphereLight args={["#ffffff", "#556b4e", 1.6]} />
         <directionalLight position={[4, 10, 6]} intensity={1.4} />
@@ -104,12 +98,12 @@ export function BoardScene() {
         <Path road={road} />
         <Landmarks road={road} />
         <Tokens road={road} />
-        <JumpArcs arcs={arcs} selected={selected} onSelect={setSelected} />
+        <JumpArcs arcs={arcs} />
         <Suspense fallback={null}>
           <Cells road={road} />
           <ReadySignal onReady={() => setReady(true)} />
         </Suspense>
-        {import.meta.env.DEV && <DebugHook road={road} arcs={arcs} selected={selected} />}
+        {import.meta.env.DEV && <DebugHook road={road} arcs={arcs} />}
       </Canvas>
     </div>
   );

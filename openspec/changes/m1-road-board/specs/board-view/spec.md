@@ -56,13 +56,6 @@ Each Snake and Ladder SHALL be drawn as a glowing arc from its start Cell to its
 - **WHEN** a player looks at the arc between Cells 27 and 19
 - **THEN** it is in the Snake colour and its destination marker is at Cell 19
 
-### Requirement: Event Names are shown on demand
-Hovering over a Snake or Ladder arc with a mouse, or tapping it on a touch screen, SHALL show its Event Name. Event Names SHALL NOT be shown permanently.
-
-#### Scenario: Tapping the poppies
-- **WHEN** a player taps the arc from Cell 27 to Cell 19
-- **THEN** the label "Deadly Poppies" appears next to it until they tap elsewhere
-
 ### Requirement: Both Tokens wait at Start
 The Board SHALL show two Tokens at Start, side by side without overlapping: orange for the Match creator and blue for the joiner.
 

@@ -1,8 +1,6 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect } from "react";
 import { Spherical, Vector3 } from "three";
 import { arcTop, type JumpArc } from "./arcs";
-import { EVENT_NAMES } from "./oz";
 import type { Road } from "./road";
 
 /** Snapshot of the scene for browser automation; only exists in development builds. */
@@ -10,8 +8,7 @@ export interface BoardDebug {
   viewport: { width: number; height: number };
   camera: { distance: number; polarDegrees: number; azimuthDegrees: number };
   cells: { cell: number; x: number; y: number; onScreen: boolean }[];
-  arcs: { from: number; to: number; kind: string; eventName: string; x: number; y: number }[];
-  selectedEventName: string | null;
+  arcs: { from: number; to: number; kind: string; x: number; y: number }[];
 }
 
 declare global {
@@ -21,19 +18,8 @@ declare global {
 }
 
 /** Publishes `window.__board` after every rendered frame. Mounted only when `import.meta.env.DEV`. */
-export function DebugHook({
-  road,
-  arcs,
-  selected,
-}: {
-  road: Road;
-  arcs: JumpArc[];
-  selected: number | null;
-}) {
+export function DebugHook({ road, arcs }: { road: Road; arcs: JumpArc[] }) {
   const controls = useThree((state) => state.controls) as { target?: Vector3 } | null;
-  const invalidate = useThree((state) => state.invalidate);
-  // The scene only redraws on demand; ask for a frame so the snapshot reflects a new selection.
-  useEffect(() => invalidate(), [selected, invalidate]);
   useFrame(({ camera, size }) => {
     const toScreen = (world: Vector3) => {
       const ndc = world.clone().project(camera);
@@ -61,9 +47,8 @@ export function DebugHook({
       arcs: arcs.map((arc) => {
         const p = toScreen(arcTop(arc));
         const { kind, from, to } = arc.jump;
-        return { from, to, kind, eventName: EVENT_NAMES[from]!, x: p.x, y: p.y };
+        return { from, to, kind, x: p.x, y: p.y };
       }),
-      selectedEventName: selected === null ? null : (EVENT_NAMES[selected] ?? null),
     };
   });
   return null;

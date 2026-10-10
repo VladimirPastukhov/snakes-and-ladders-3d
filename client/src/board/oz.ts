@@ -19,16 +19,6 @@ export const REGIONS: readonly Region[] = [
   { name: "Emerald City", firstCell: 30, lastCell: 30, groundColor: "#2fae66" },
 ];
 
-/** Event Name of each Snake and Ladder, keyed by its start Cell. */
-export const EVENT_NAMES: Readonly<Record<number, string>> = {
-  3: "Good Witch's Kiss",
-  16: "Tin Woodman's Log Bridge",
-  24: "Rescue by the Field Mice",
-  18: "The Kalidahs",
-  22: "Swept Away by the River",
-  27: "Deadly Poppies",
-};
-
 export const COLORS = {
   road: "#f2c94c",
   path: "#d9a92e",

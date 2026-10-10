@@ -47,7 +47,7 @@ Against production, CI also sets `EXPECTED_VERSION` to the deployed commit SHA.
 
 ### Visual checks
 
-Development builds expose `window.__board`: where every Cell and arc is on screen, the camera angle and distance, and the selected Event Name. Production builds strip it. The visual checks use it to assert that all 30 Cells are visible on a phone and on a desktop, and that hovering an arc shows its Event Name, then save screenshots to `e2e/visual-output/`:
+Development builds expose `window.__board`: where every Cell and arc is on screen, and the camera angle and distance. Production builds strip it. The visual checks use it to assert that all 30 Cells are visible on a phone and on a desktop, then save screenshots to `e2e/visual-output/`:
 
 ```sh
 pnpm dev        # in one terminal

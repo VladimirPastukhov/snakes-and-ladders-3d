@@ -54,13 +54,3 @@ body {
   margin: 96px 16px 0;
   max-width: 32em;
 }
-
-.event-label {
-  background: #2b2118;
-  color: #fff;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 14px;
-  white-space: nowrap;
-  pointer-events: none;
-}
