@@ -1,0 +1,56 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #bfe3f2;
+  color: #2b2118;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.app,
+.board {
+  position: fixed;
+  inset: 0;
+}
+
+/* Let the canvas own touch gestures (rotate, pinch) instead of the browser. */
+.board canvas {
+  touch-action: none;
+}
+
+.overlay {
+  position: fixed;
+  pointer-events: none;
+  background: rgb(255 255 255 / 75%);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.title {
+  top: max(8px, env(safe-area-inset-top));
+  left: 8px;
+  right: 8px;
+  width: fit-content;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: clamp(16px, 4.5vw, 24px);
+}
+
+.version {
+  bottom: max(8px, env(safe-area-inset-bottom));
+  right: 8px;
+  font-size: 12px;
+}
+
+.no-webgl {
+  margin: 96px 16px 0;
+  max-width: 32em;
+}

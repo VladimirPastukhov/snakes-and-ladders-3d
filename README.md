@@ -8,12 +8,12 @@ An online two-player 3D Snakes & Ladders game played in the browser, themed as t
 
 ## Project layout
 
-| Path      | What it is                                                            |
-| --------- | --------------------------------------------------------------------- |
-| `client/` | The game page (Vite + React)                                          |
-| `server/` | The Cloudflare Worker that serves the page and the `/api/*` endpoints |
-| `shared/` | Code used by both client and server (`@sl/shared`)                    |
-| `e2e/`    | Playwright smoke test that runs against production after every deploy |
+| Path      | What it is                                                                       |
+| --------- | -------------------------------------------------------------------------------- |
+| `client/` | The game page: the 3D Board (Vite + React + React Three Fiber); needs WebGL      |
+| `server/` | The Cloudflare Worker that serves the page and the `/api/*` endpoints            |
+| `shared/` | Code used by both client and server (`@sl/shared`)                               |
+| `e2e/`    | Playwright smoke test (production, after every deploy) and visual checks (local) |
 
 ## Prerequisites
 
@@ -44,6 +44,15 @@ BASE_URL=http://localhost:8787 pnpm smoke     # in another terminal
 ```
 
 Against production, CI also sets `EXPECTED_VERSION` to the deployed commit SHA.
+
+### Visual checks
+
+Development builds expose `window.__board`: where every Cell and arc is on screen, and the camera angle and distance. Production builds strip it. The visual checks use it to assert that all 30 Cells are visible on a phone and on a desktop, then save screenshots to `e2e/visual-output/`:
+
+```sh
+pnpm dev        # in one terminal
+pnpm visual     # in another terminal
+```
 
 ## How changes reach production
 
