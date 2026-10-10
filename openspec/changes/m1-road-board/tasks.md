@@ -30,12 +30,12 @@
 
 ## 6. Visual review and docs
 
-- [ ] 6.1 Add a Playwright visual-check script run against `pnpm dev` (not part of the smoke test) that, at 390 × 844 and 1440 × 900, asserts via `window.__board` that all 30 Cells are inside the window, hovers the 27→19 arc at its reported midpoint and asserts "Deadly Poppies" is shown, and saves screenshots; verify it passes and review the screenshots against the `board-view` scenarios (Regions distinct, arc colours and destination markers, Tokens at Start, landmarks), then attach them to the PR
+- [x] 6.1 Add a Playwright visual-check script run against `pnpm dev` (not part of the smoke test) that, at 390 × 844 and 1440 × 900, asserts via `window.__board` that all 30 Cells are inside the window, hovers the 27→19 arc at its reported midpoint and asserts "Deadly Poppies" is shown, and saves screenshots; verify it passes and review the screenshots against the `board-view` scenarios (Regions distinct, arc colours and destination markers, Tokens at Start, landmarks), then attach them to the PR
 - [x] 6.2 Update `README.md` where it describes the client (now a 3D Board, needs WebGL); verify `pnpm format:check` passes
 
 ## 7. Acceptance
 
-- [ ] 7.1 Open the M1 pull request; verify CI is green
+- [x] 7.1 Open the M1 pull request; verify CI is green
 - [ ] 7.2 Owner opens the PR build (local `pnpm dev` reachable from the phone, or production after merge) on their phone; verify all 30 numbers are visible in portrait, rotating and pinch-zooming has no visible stutter, and tapping an arc shows its Event Name
 
 ## Workflow follow-up
