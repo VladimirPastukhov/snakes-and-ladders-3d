@@ -29,7 +29,7 @@
 ## 6. Acceptance
 
 - [x] 6.1 Open the M3 pull request with screenshots from 4.1; verify CI is green
-- [ ] 6.2 Owner plays a whole Match between the computer and the phone on the local network (`pnpm --filter server dev` + `pnpm --filter client dev --host`); verify the Roll button appears only on the Current Player's screen, both screens show each Turn, Tokens stand on the right Cells, and both screens announce the Winner
+- [x] 6.2 Owner plays a whole Match between the computer and the phone on the local network (`pnpm --filter server dev` + `pnpm --filter client dev --host`); verify the Roll button appears only on the Current Player's screen, both screens show each Turn, Tokens stand on the right Cells, and both screens announce the Winner
 
 ## Workflow follow-up
 
