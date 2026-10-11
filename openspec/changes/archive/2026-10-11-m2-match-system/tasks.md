@@ -39,7 +39,7 @@
 ## 7. Acceptance
 
 - [x] 7.1 Open the M2 pull request with screenshots from 5.1; verify CI is green
-- [ ] 7.2 Owner creates a Match on the computer and joins it from their phone via the invite link (local network `pnpm dev`); verify both screens show both Players, closing the phone tab shows it disconnected, and reopening the link brings it back to the Scarecrow seat
+- [x] 7.2 Owner creates a Match on the computer and joins it from their phone via the invite link (local network `pnpm dev`); verify both screens show both Players, closing the phone tab shows it disconnected, and reopening the link brings it back to the Scarecrow seat
 
 ## Workflow follow-up
 
