@@ -17,6 +17,12 @@ export function checkName(input: string): NameCheck {
   return { ok: true, name };
 }
 
+// crypto.randomUUID only exists on https and localhost; getRandomValues works on a LAN address too.
+function randomToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 type KeyValue = Pick<Storage, "getItem" | "setItem">;
 
 function browserStorage(): KeyValue | null {
@@ -67,7 +73,7 @@ export class Identity {
   get token(): string {
     let token = this.read(TOKEN_KEY);
     if (!token) {
-      token = crypto.randomUUID();
+      token = randomToken();
       this.write(TOKEN_KEY, token);
     }
     return token;

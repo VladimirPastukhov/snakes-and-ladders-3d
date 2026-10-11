@@ -45,6 +45,13 @@ pnpm typecheck        # TypeScript in every workspace
 pnpm build            # build the client into client/dist
 ```
 
+To try a Match from a phone on the same Wi-Fi, run the two halves separately and open the **Network** URL Vite prints (e.g. `http://192.168.1.20:5173`) on both devices:
+
+```sh
+pnpm --filter server dev           # in one terminal
+pnpm --filter client dev --host    # in another terminal
+```
+
 ### Smoke test
 
 The smoke test needs a running server with a built client:

@@ -47,7 +47,7 @@ describe("Identity", () => {
   it("creates one random token and keeps it", () => {
     const storage = memoryStorage();
     const token = new Identity(storage).token;
-    expect(token).toMatch(/^[0-9a-f-]{36}$/);
+    expect(token).toMatch(/^[0-9a-f]{32}$/);
     expect(new Identity(storage).token).toBe(token);
     expect(new Identity(memoryStorage()).token).not.toBe(token);
   });

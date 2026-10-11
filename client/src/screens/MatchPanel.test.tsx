@@ -54,6 +54,18 @@ describe("MatchPanel", () => {
     );
   });
 
+  it("falls back to copying the selected link without the Clipboard API", async () => {
+    Object.defineProperty(navigator, "clipboard", { value: undefined, configurable: true });
+    const execCommand = vi.fn(() => true);
+    document.execCommand = execCommand;
+    renderFrom(waiting);
+    fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Copied!" })).toBeInTheDocument(),
+    );
+    expect(execCommand).toHaveBeenCalledWith("copy");
+  });
+
   it("shows both Players and who is disconnected", () => {
     renderFrom({
       ...waiting,

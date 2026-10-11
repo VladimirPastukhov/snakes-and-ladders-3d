@@ -42,7 +42,7 @@ The server parses every incoming message with zod and closes the socket on inval
 Hibernation means an idle Match costs nothing while both Players wait, which keeps us on the free plan.
 
 ### Client structure
-- `client/src/identity.ts`: read/write the display name and session token (`crypto.randomUUID()`) in `localStorage`, with name trimming and validation. If storage is unavailable (some private modes), it falls back to memory for the page's lifetime.
+- `client/src/identity.ts`: read/write the display name and session token (128 random bits from `crypto.getRandomValues`, which, unlike `crypto.randomUUID`, also works on a plain-http LAN address) in `localStorage`, with name trimming and validation. If storage is unavailable (some private modes), it falls back to memory for the page's lifetime.
 - The browser also remembers the codes of the last 20 Matches it holds a Seat in. Opening one of those links (refresh, reopen) connects straight away; any other Match link first shows the name prompt, pre-filled with the remembered name.
 - `client/src/route.ts`: `/` is home, `/m/<code>` is a Match. It uses `history.pushState` and `popstate`, with no router library.
 - `client/src/match/connection.ts`: opens the WebSocket, sends `hello` on every (re)connect, reconnects with backoff (0.5 s doubling to 5 s) until the page closes or the server sends `rejected` or `replaced`.

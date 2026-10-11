@@ -1,5 +1,5 @@
 import { SEATS, type MatchSnapshot, type Seat } from "@sl/shared";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { SEAT_LOOK } from "../board/oz";
 import { matchPath } from "../route";
 
@@ -19,13 +19,16 @@ export function MatchPanel({
 }: MatchPanelProps) {
   const link = origin + matchPath(match.code);
   const [copied, setCopied] = useState(false);
+  const linkField = useRef<HTMLInputElement>(null);
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
     } catch {
-      setCopied(false);
+      // No Clipboard API on plain http (e.g. a phone on the local network): copy the selection.
+      linkField.current?.select();
+      setCopied(document.execCommand("copy"));
     }
   }
 
@@ -40,7 +43,13 @@ export function MatchPanel({
         Match Code <strong data-testid="match-code">{match.code}</strong>
       </p>
       <div className="row">
-        <input readOnly value={link} aria-label="Invite link" onFocus={(e) => e.target.select()} />
+        <input
+          ref={linkField}
+          readOnly
+          value={link}
+          aria-label="Invite link"
+          onFocus={(e) => e.target.select()}
+        />
         <button type="button" onClick={copy}>
           {copied ? "Copied!" : "Copy link"}
         </button>
