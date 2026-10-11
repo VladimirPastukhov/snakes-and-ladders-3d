@@ -9,6 +9,7 @@ import {
   useState,
   type ComponentRef,
 } from "react";
+import type { Seat } from "@sl/shared";
 import { Vector3 } from "three";
 import { buildArcs, type JumpArc } from "./arcs";
 import { CAMERA_FOV, ORBIT_LIMITS, fitCamera } from "./camera";
@@ -82,7 +83,8 @@ function ReadySignal({ onReady }: { onReady: () => void }) {
   return null;
 }
 
-export function BoardScene() {
+/** The Board, with a Token for each seat in `seats`. */
+export function BoardScene({ seats }: { seats: readonly Seat[] }) {
   const road = useMemo(() => buildRoad(), []);
   const arcs: JumpArc[] = useMemo(() => buildArcs(road), [road]);
   const [ready, setReady] = useState(false);
@@ -97,13 +99,13 @@ export function BoardScene() {
         <Ground road={road} />
         <Path road={road} />
         <Landmarks road={road} />
-        <Tokens road={road} />
+        <Tokens road={road} seats={seats} />
         <JumpArcs arcs={arcs} />
         <Suspense fallback={null}>
           <Cells road={road} />
           <ReadySignal onReady={() => setReady(true)} />
         </Suspense>
-        {import.meta.env.DEV && <DebugHook road={road} arcs={arcs} />}
+        {import.meta.env.DEV && <DebugHook road={road} arcs={arcs} tokens={seats} />}
       </Canvas>
     </div>
   );

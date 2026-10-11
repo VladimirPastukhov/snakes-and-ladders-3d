@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 // Mirrors the shape of `window.__board` (client/src/board/debug.tsx); only the fields used here.
 interface BoardDebug {
   cells: { cell: number; onScreen: boolean }[];
+  tokens: string[];
 }
 
 const VIEWPORTS = [
@@ -28,6 +29,7 @@ for (const viewport of VIEWPORTS) {
       const { cells } = await board(page);
       expect(cells).toHaveLength(30);
       expect(cells.filter((c) => !c.onScreen).map((c) => c.cell)).toEqual([]);
+      expect((await board(page)).tokens).toEqual([]);
       await page.screenshot({ path: `visual-output/${viewport.name}.png` });
     });
   });

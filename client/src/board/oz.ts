@@ -1,5 +1,7 @@
 // Oz presentation data: names and colours only. The rules-level Board lives in @sl/shared.
 
+import type { Seat } from "@sl/shared";
+
 export interface Region {
   name: string;
   /** First and last Cell of the Region, inclusive. */
@@ -32,3 +34,9 @@ export const COLORS = {
 export function regionOf(cell: number): Region | undefined {
   return REGIONS.find((region) => cell >= region.firstCell && cell <= region.lastCell);
 }
+
+/** Who each seat plays in the story, and its Token colour. */
+export const SEAT_LOOK: Record<Seat, { character: string; color: string }> = {
+  creator: { character: "Dorothy", color: COLORS.creatorToken },
+  joiner: { character: "Scarecrow", color: COLORS.joinerToken },
+};

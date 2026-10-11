@@ -1,4 +1,6 @@
 import { useFrame, useThree } from "@react-three/fiber";
+import type { Seat } from "@sl/shared";
+import { useEffect } from "react";
 import { Spherical, Vector3 } from "three";
 import { arcTop, type JumpArc } from "./arcs";
 import type { Road } from "./road";
@@ -9,6 +11,8 @@ export interface BoardDebug {
   camera: { distance: number; polarDegrees: number; azimuthDegrees: number };
   cells: { cell: number; x: number; y: number; onScreen: boolean }[];
   arcs: { from: number; to: number; kind: string; x: number; y: number }[];
+  /** Seats whose Token is drawn. */
+  tokens: Seat[];
 }
 
 declare global {
@@ -18,8 +22,19 @@ declare global {
 }
 
 /** Publishes `window.__board` after every rendered frame. Mounted only when `import.meta.env.DEV`. */
-export function DebugHook({ road, arcs }: { road: Road; arcs: JumpArc[] }) {
+export function DebugHook({
+  road,
+  arcs,
+  tokens,
+}: {
+  road: Road;
+  arcs: JumpArc[];
+  tokens: readonly Seat[];
+}) {
   const controls = useThree((state) => state.controls) as { target?: Vector3 } | null;
+  const invalidate = useThree((state) => state.invalidate);
+  // The frameloop is on demand: draw a frame when the Tokens change so the hook updates.
+  useEffect(() => invalidate(), [tokens, invalidate]);
   useFrame(({ camera, size }) => {
     const toScreen = (world: Vector3) => {
       const ndc = world.clone().project(camera);
@@ -49,6 +64,7 @@ export function DebugHook({ road, arcs }: { road: Road; arcs: JumpArc[] }) {
         const { kind, from, to } = arc.jump;
         return { from, to, kind, x: p.x, y: p.y };
       }),
+      tokens: [...tokens],
     };
   });
   return null;

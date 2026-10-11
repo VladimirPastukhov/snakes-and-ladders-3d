@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { GAME_TITLE } from "@sl/shared";
 import { App } from "./App";
+import { Identity } from "./identity";
 
 describe("App", () => {
   it("shows the game title and build version", () => {
@@ -14,5 +15,20 @@ describe("App", () => {
     // jsdom has no WebGL, so the App takes the fallback path here.
     render(<App />);
     expect(screen.getByRole("alert")).toHaveTextContent("This game needs 3D graphics (WebGL)");
+  });
+
+  it("opens on the home screen", () => {
+    render(<App identity={new Identity(null)} />);
+    expect(screen.getByRole("button", { name: "New Match" })).toBeInTheDocument();
+  });
+
+  describe("on a Match link", () => {
+    afterEach(() => window.history.replaceState(null, "", "/"));
+
+    it("asks a new visitor for their name before joining", () => {
+      window.history.replaceState(null, "", "/m/k7qxm");
+      render(<App identity={new Identity(null)} />);
+      expect(screen.getByRole("heading", { name: "Join match K7QXM" })).toBeInTheDocument();
+    });
   });
 });

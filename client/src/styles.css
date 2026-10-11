@@ -13,10 +13,18 @@ body {
   overscroll-behavior: none;
 }
 
-.app,
-.board {
+/* The Board fills the space above the screen's panel, so the panel never hides a Cell. */
+.app {
   position: fixed;
   inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.board {
+  position: relative;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Let the canvas own touch gestures (rotate, pinch) instead of the browser. */
@@ -53,4 +61,140 @@ body {
 .no-webgl {
   margin: 96px 16px 0;
   max-width: 32em;
+}
+
+/* Screens sit under the Board, clear of the version line. */
+.panel {
+  flex: none;
+  margin: 8px auto calc(max(8px, env(safe-area-inset-bottom)) + 28px);
+  width: min(100% - 16px, 380px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 90%);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.panel p {
+  margin: 0;
+}
+
+.panel label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.panel input {
+  min-width: 0;
+  flex: 1;
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid #b9a98f;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.panel button {
+  font: inherit;
+  padding: 8px 14px;
+  border: 1px solid #b9a98f;
+  border-radius: 8px;
+  background: #fff8e6;
+  color: inherit;
+  cursor: pointer;
+}
+
+.panel button.primary {
+  background: #f2c94c;
+  border-color: #d9a92e;
+  font-weight: 600;
+}
+
+.panel button.link {
+  border: none;
+  background: none;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+.panel button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.panel .row,
+.panel .join {
+  display: flex;
+  gap: 8px;
+}
+
+.panel .join {
+  flex-direction: column;
+}
+
+.panel .error {
+  color: #b3261e;
+  font-size: 14px;
+}
+
+.panel .status {
+  font-weight: 600;
+  color: #8a5a00;
+}
+
+.panel .code strong {
+  font-size: 20px;
+  letter-spacing: 0.12em;
+}
+
+.seats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.seats li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.character {
+  font-weight: 600;
+}
+
+.presence {
+  font-size: 13px;
+  margin-left: auto;
+}
+
+.presence.on {
+  color: #1e7a3c;
+}
+
+.presence.off {
+  color: #8a6f5a;
+}
+
+.waiting {
+  color: #6b5d4f;
+  font-style: italic;
 }

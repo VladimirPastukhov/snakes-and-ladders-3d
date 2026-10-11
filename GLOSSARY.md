@@ -18,6 +18,10 @@ _Avoid_: Room code, invite ID, game ID
 An anonymous participant in a Match, known by a display name.
 _Avoid_: User, account, client
 
+**Seat**:
+One of a Match's two places for a Player: the creator's (shown as Dorothy) or the joiner's (shown as Scarecrow). A Player keeps their Seat for the whole Match, even while disconnected.
+_Avoid_: Slot, side, team
+
 **Match Phase**:
 Where a Match is in its lifecycle: _Waiting_ (one Player present), _In progress_, _Finished_ (a Winner exists) or _Abandoned_.
 _Avoid_: Status, state
