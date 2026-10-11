@@ -15,6 +15,12 @@
     // Overridden by CI with the deployed commit SHA: wrangler deploy --var VERSION:<sha>
     "VERSION": "dev",
   },
+  // One Durable Object per Match (ADR 0001). It owns the seats and every socket of that Match.
+  "durable_objects": {
+    "bindings": [{ "name": "MATCH", "class_name": "Match" }],
+  },
+  // Once deployed, a migration can't be undone: roll forward, never back past it.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Match"] }],
   "observability": {
     "enabled": true,
   },

@@ -8,7 +8,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "http://localhost:8787",
+      // ws: Match WebSockets go to Wrangler too.
+      "/api": { target: "http://localhost:8787", ws: true },
     },
   },
   test: {

@@ -1,6 +1,7 @@
 import { Text } from "@react-three/drei";
 import fredokaUrl from "@fontsource/fredoka/files/fredoka-latin-600-normal.woff?url";
-import { COLORS, REGIONS, regionOf } from "./oz";
+import type { Seat } from "@sl/shared";
+import { COLORS, REGIONS, SEAT_LOOK, regionOf } from "./oz";
 import type { Road } from "./road";
 
 const SLAB_HEIGHT = 0.18;
@@ -136,23 +137,22 @@ function Pawn({ color, x, z }: { color: string; x: number; z: number }) {
   );
 }
 
-/** Both Tokens side by side at Start, across the road from each other. */
-export function Tokens({ road }: { road: Road }) {
+/** A Token at Start for each taken seat; the two stand side by side across the road. */
+export function Tokens({ road, seats }: { road: Road; seats: readonly Seat[] }) {
   const { position, tangent } = road.start;
   const side = { x: -tangent.z, z: tangent.x };
   const offset = road.cellSize * 0.32;
+  const sign: Record<Seat, number> = { creator: 1, joiner: -1 };
   return (
     <group>
-      <Pawn
-        color={COLORS.creatorToken}
-        x={position.x + side.x * offset}
-        z={position.z + side.z * offset}
-      />
-      <Pawn
-        color={COLORS.joinerToken}
-        x={position.x - side.x * offset}
-        z={position.z - side.z * offset}
-      />
+      {seats.map((seat) => (
+        <Pawn
+          key={seat}
+          color={SEAT_LOOK[seat].color}
+          x={position.x + side.x * offset * sign[seat]}
+          z={position.z + side.z * offset * sign[seat]}
+        />
+      ))}
     </group>
   );
 }
