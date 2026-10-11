@@ -1,6 +1,7 @@
 import { GAME_TITLE, SEATS, type Seat } from "@sl/shared";
 import { useMemo, useState } from "react";
 import { BoardScene } from "./board/BoardScene";
+import type { TokenSpot } from "./board/scenery";
 import { Identity } from "./identity";
 import { createMatch } from "./match/api";
 import { isReconnecting } from "./match/state";
@@ -14,6 +15,14 @@ import { hasWebGL } from "./webgl";
 
 const goHome = () => navigate("/");
 
+function parseTokens(key: string): TokenSpot[] {
+  if (!key) return [];
+  return key.split(",").map((part) => {
+    const [seat, cell] = part.split(":");
+    return { seat: seat as Seat, cell: Number(cell) };
+  });
+}
+
 export function App({ identity: given }: { identity?: Identity } = {}) {
   const [webgl] = useState(hasWebGL);
   const [identity] = useState(() => given ?? new Identity());
@@ -24,11 +33,16 @@ export function App({ identity: given }: { identity?: Identity } = {}) {
   const code = route.page === "match" ? route.code : null;
   const needsName =
     code !== null && confirmed !== code && !(identity.name && identity.knowsMatch(code));
-  const state = useMatch(needsName ? null : code, identity);
+  const { state, roll } = useMatch(needsName ? null : code, identity);
 
   const snapshot = code ? state.match : undefined;
-  const takenKey = snapshot ? SEATS.filter((seat) => snapshot.seats[seat]).join() : "";
-  const seats = useMemo(() => (takenKey ? (takenKey.split(",") as Seat[]) : []), [takenKey]);
+  // A stable key, so the Board only redraws Tokens when a Seat or a position changes.
+  const tokensKey = snapshot
+    ? SEATS.filter((seat) => snapshot.seats[seat])
+        .map((seat) => `${seat}:${snapshot.positions[seat]}`)
+        .join()
+    : "";
+  const tokens = useMemo(() => parseTokens(tokensKey), [tokensKey]);
 
   async function create(name: string) {
     identity.setName(name);
@@ -60,7 +74,15 @@ export function App({ identity: given }: { identity?: Identity } = {}) {
       />
     );
   } else if (state.match && state.you && (state.status === "seated" || isReconnecting(state))) {
-    panel = <MatchPanel match={state.match} you={state.you} reconnecting={isReconnecting(state)} />;
+    panel = (
+      <MatchPanel
+        match={state.match}
+        you={state.you}
+        reconnecting={isReconnecting(state)}
+        onRoll={roll}
+        onHome={goHome}
+      />
+    );
   } else {
     panel = <MatchMessage status={state.status} onHome={goHome} />;
   }
@@ -68,7 +90,7 @@ export function App({ identity: given }: { identity?: Identity } = {}) {
   return (
     <main className="app">
       {webgl ? (
-        <BoardScene seats={seats} />
+        <BoardScene tokens={tokens} />
       ) : (
         <p className="no-webgl" role="alert">
           This game needs 3D graphics (WebGL), which this browser has turned off or does not

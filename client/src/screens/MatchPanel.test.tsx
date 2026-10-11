@@ -8,6 +8,10 @@ const waiting: MatchSnapshot = {
   code: "K7QXM",
   phase: "waiting",
   seats: { creator: { name: "Alex", connected: true } },
+  positions: { creator: 0, joiner: 0 },
+  currentPlayer: null,
+  winner: null,
+  lastTurn: null,
 };
 
 function seat(name: "creator" | "joiner") {
@@ -25,6 +29,8 @@ function renderFrom(match: MatchSnapshot, lost = false) {
       match={state.match!}
       you={state.you!}
       reconnecting={isReconnecting(state)}
+      onRoll={vi.fn()}
+      onHome={vi.fn()}
       origin="https://game.dev"
     />,
   );

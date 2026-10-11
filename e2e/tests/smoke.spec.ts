@@ -40,7 +40,7 @@ test("missing files and unknown API paths return 404", async ({ request }) => {
 });
 
 // Creates a real (tiny) Match in production on every deploy; M6 adds deleting old Matches.
-test("two browser sessions meet in a Match", async ({ browser }) => {
+test("two browser sessions meet in a Match and play two Turns", async ({ browser }) => {
   const alexContext = await browser.newContext();
   const samContext = await browser.newContext();
   const alex = await alexContext.newPage();
@@ -63,6 +63,25 @@ test("two browser sessions meet in a Match", async ({ browser }) => {
     for (const name of ["creator", "joiner"]) {
       await expect(seat(page, name).getByText("connected", { exact: true })).toBeVisible();
     }
+  }
+
+  // Two Turns: the first Current Player rolls, then the other, and the Turn comes back.
+  const alexStarts = (await alex.getByTestId("turn").textContent())?.includes("Your Turn");
+  const [first, second] = alexStarts ? [alex, sam] : [sam, alex];
+  const [firstName, secondName] = alexStarts
+    ? ["Smoke Alex", "Smoke Sam"]
+    : ["Smoke Sam", "Smoke Alex"];
+  for (const [roller, waiter, name, next] of [
+    [first, second, firstName, secondName],
+    [second, first, secondName, firstName],
+  ] as const) {
+    await expect(waiter.getByRole("button", { name: "Roll" })).toHaveCount(0);
+    await roller.getByRole("button", { name: "Roll" }).click();
+    for (const page of [alex, sam]) {
+      await expect(page.getByTestId("last-turn")).toHaveText(new RegExp(`^${name} rolled [1-6]: `));
+    }
+    await expect(waiter.getByTestId("turn")).toHaveText("Your Turn");
+    await expect(roller.getByTestId("turn")).toHaveText(`${next}'s Turn`);
   }
 
   await alexContext.close();

@@ -198,3 +198,38 @@ body {
   color: #6b5d4f;
   font-style: italic;
 }
+
+.play {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e3d8c3;
+}
+
+.play .turn {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.play .turn p,
+.play .winner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.play .winner {
+  font-size: 20px;
+}
+
+.play button.roll {
+  min-width: 96px;
+  font-size: 18px;
+}
+
+.last-turn {
+  font-size: 14px;
+  color: #4a3d30;
+}

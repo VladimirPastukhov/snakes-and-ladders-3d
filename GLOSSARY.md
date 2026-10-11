@@ -71,7 +71,7 @@ _Avoid_: Piece, pawn, counter
 ### Play
 
 **Turn**:
-One Roll by the Current Player plus the Move and any Jump that follow, after which play passes to the other Player.
+One Roll by the Current Player plus the Move and any Jump that follow, after which play passes to the other Player, unless that Turn produced the Winner. A six gives no extra Turn.
 
 **Current Player**:
 The Player whose Turn it is.
@@ -81,7 +81,7 @@ A single throw of one six-sided die, requested by the Current Player and decided
 _Avoid_: Throw, dice result
 
 **Move**:
-Advancing a Token forward by the rolled number of Cells.
+Advancing a Token forward by the rolled number of Cells, stopping at the Final Cell if it would pass it.
 
 **Jump**:
 The automatic relocation of a Token by a Snake or Ladder at the end of a Move.

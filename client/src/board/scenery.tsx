@@ -122,9 +122,9 @@ export function Landmarks({ road }: { road: Road }) {
   );
 }
 
-function Pawn({ color, x, z }: { color: string; x: number; z: number }) {
+function Pawn({ color, x, y, z }: { color: string; x: number; y: number; z: number }) {
   return (
-    <group position={[x, 0, z]}>
+    <group position={[x, y, z]}>
       <mesh position-y={0.2}>
         <cylinderGeometry args={[0.13, 0.22, 0.4, 10]} />
         <meshLambertMaterial color={color} />
@@ -137,22 +137,34 @@ function Pawn({ color, x, z }: { color: string; x: number; z: number }) {
   );
 }
 
-/** A Token at Start for each taken seat; the two stand side by side across the road. */
-export function Tokens({ road, seats }: { road: Road; seats: readonly Seat[] }) {
-  const { position, tangent } = road.start;
-  const side = { x: -tangent.z, z: tangent.x };
+/** Where one Seat's Token stands: 0 is Start, otherwise a Cell number. */
+export interface TokenSpot {
+  seat: Seat;
+  cell: number;
+}
+
+/**
+ * Each Token on its Cell (or at Start), on its own side of the road, so two Tokens on one
+ * Cell stand side by side and the Cell number between them stays readable.
+ */
+export function Tokens({ road, tokens }: { road: Road; tokens: readonly TokenSpot[] }) {
   const offset = road.cellSize * 0.32;
   const sign: Record<Seat, number> = { creator: 1, joiner: -1 };
   return (
     <group>
-      {seats.map((seat) => (
-        <Pawn
-          key={seat}
-          color={SEAT_LOOK[seat].color}
-          x={position.x + side.x * offset * sign[seat]}
-          z={position.z + side.z * offset * sign[seat]}
-        />
-      ))}
+      {tokens.map(({ seat, cell }) => {
+        const { position, tangent } = cell === 0 ? road.start : road.cells[cell - 1]!;
+        const side = { x: -tangent.z * offset * sign[seat], z: tangent.x * offset * sign[seat] };
+        return (
+          <Pawn
+            key={seat}
+            color={SEAT_LOOK[seat].color}
+            x={position.x + side.x}
+            y={cell === 0 ? 0 : SLAB_HEIGHT}
+            z={position.z + side.z}
+          />
+        );
+      })}
     </group>
   );
 }

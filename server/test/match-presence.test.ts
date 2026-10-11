@@ -1,17 +1,7 @@
 import { env } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
-import { TestSocket, createMatch, newToken } from "./socket";
-
-async function seatedPair() {
-  const alex = newToken();
-  const sam = newToken();
-  const code = await createMatch(alex, "Alex");
-  const [alexSocket] = await TestSocket.hello(code, alex, "Alex");
-  const [samSocket] = await TestSocket.hello(code, sam, "Sam");
-  await alexSocket.next(); // Sam joined
-  return { code, alex, sam, alexSocket, samSocket };
-}
+import { TestSocket, seatedPair } from "./socket";
 
 function stub(code: string) {
   return env.MATCH.get(env.MATCH.idFromName(code));

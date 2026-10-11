@@ -19,10 +19,12 @@ An online two-player 3D Snakes & Ladders game played in the browser, themed as t
 
 Each Match lives in its own [Durable Object](https://developers.cloudflare.com/durable-objects/) (`server/src/match.ts`, see ADR 0001), named by its Match Code. It stores the two Seats (name and a SHA-256 hash of the Player's session token) and holds every WebSocket connected to the Match. Who is connected is worked out from the open sockets, never stored.
 
-| Endpoint                                | What it does                                                                                                        |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `POST /api/matches` `{ token, name }`   | Creates a Match with the caller in the creator Seat; answers `201 { code }`                                         |
-| `GET /api/matches/:code/ws` (WebSocket) | Joins or returns to a Match. The client sends `hello { token, name }`; the server answers `welcome`, then `update`s |
+| Endpoint                                | What it does                                                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/matches` `{ token, name }`   | Creates a Match with the caller in the creator Seat; answers `201 { code }`                                                                       |
+| `GET /api/matches/:code/ws` (WebSocket) | Joins or returns to a Match and plays it. The client sends `hello { token, name }` and later `roll`; the server answers `welcome`, then `update`s |
+
+During play the Current Player's client sends `roll`; the server throws the die (`server/src/dice.ts`), plays the Turn with the pure rules in `shared/src/rules.ts`, and sends both Players an `update` with event `rolled`. A `roll` from anyone else is ignored. Every snapshot carries the Seats, the Match Phase, both Token positions (0 = Start), the Current Player, the Winner and the last Turn, so a reconnecting Player needs nothing else.
 
 The messages are defined and validated with zod in `shared/src/protocol.ts`. A refused join (`full`, `not_found`) arrives as a `rejected` message, and a tab replaced by a newer one is closed with code 4001.
 
@@ -67,7 +69,7 @@ Against production, CI also sets `EXPECTED_VERSION` to the deployed commit SHA.
 
 ### Visual checks
 
-Development builds expose `window.__board`: where every Cell and arc is on screen, the camera angle and distance, and which Tokens are drawn. Production builds strip it. The visual checks use it to assert that all 30 Cells are visible on a phone and on a desktop, and play a two-Player Match in separate browser contexts (join, leave, return, second tab, full, not found). Screenshots go to `e2e/visual-output/`:
+Development builds expose `window.__board`: where every Cell and arc is on screen, the camera angle and distance, and which Tokens are drawn. Production builds strip it. The visual checks use it to assert that all 30 Cells are visible on a phone and on a desktop, and play two-Player Matches in separate browser contexts: joining, leaving, returning, second tab, full, not found, and a whole game to a Winner. Screenshots go to `e2e/visual-output/`:
 
 ```sh
 pnpm dev        # in one terminal

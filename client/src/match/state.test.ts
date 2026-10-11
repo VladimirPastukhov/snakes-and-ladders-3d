@@ -6,6 +6,10 @@ const waiting: MatchSnapshot = {
   code: "K7QXM",
   phase: "waiting",
   seats: { creator: { name: "Alex", connected: true } },
+  positions: { creator: 0, joiner: 0 },
+  currentPlayer: null,
+  winner: null,
+  lastTurn: null,
 };
 const both: MatchSnapshot = {
   ...waiting,

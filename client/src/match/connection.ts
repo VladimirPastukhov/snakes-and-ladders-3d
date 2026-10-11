@@ -17,6 +17,8 @@ export interface ConnectionHandlers {
 }
 
 export interface Connection {
+  /** Sends if the socket is open; a message sent while reconnecting is dropped. */
+  send: (message: ClientMessage) => void;
   close: () => void;
 }
 
@@ -67,6 +69,9 @@ export function connectToMatch(
 
   open();
   return {
+    send(message) {
+      if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
+    },
     close() {
       stopped = true;
       clearTimeout(retryTimer);

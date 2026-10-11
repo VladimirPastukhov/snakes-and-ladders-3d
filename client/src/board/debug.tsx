@@ -1,9 +1,9 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import type { Seat } from "@sl/shared";
 import { useEffect } from "react";
 import { Spherical, Vector3 } from "three";
 import { arcTop, type JumpArc } from "./arcs";
 import type { Road } from "./road";
+import type { TokenSpot } from "./scenery";
 
 /** Snapshot of the scene for browser automation; only exists in development builds. */
 export interface BoardDebug {
@@ -11,8 +11,8 @@ export interface BoardDebug {
   camera: { distance: number; polarDegrees: number; azimuthDegrees: number };
   cells: { cell: number; x: number; y: number; onScreen: boolean }[];
   arcs: { from: number; to: number; kind: string; x: number; y: number }[];
-  /** Seats whose Token is drawn. */
-  tokens: Seat[];
+  /** The drawn Tokens and where they stand (0 = Start). */
+  tokens: TokenSpot[];
 }
 
 declare global {
@@ -29,7 +29,7 @@ export function DebugHook({
 }: {
   road: Road;
   arcs: JumpArc[];
-  tokens: readonly Seat[];
+  tokens: readonly TokenSpot[];
 }) {
   const controls = useThree((state) => state.controls) as { target?: Vector3 } | null;
   const invalidate = useThree((state) => state.invalidate);
@@ -64,7 +64,7 @@ export function DebugHook({
         const { kind, from, to } = arc.jump;
         return { from, to, kind, x: p.x, y: p.y };
       }),
-      tokens: [...tokens],
+      tokens: tokens.map((t) => ({ ...t })),
     };
   });
   return null;

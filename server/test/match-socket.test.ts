@@ -12,10 +12,19 @@ describe("joining a Match over WebSocket", () => {
     expect(alexWelcome).toEqual({
       type: "welcome",
       you: "creator",
-      match: { code, phase: "waiting", seats: { creator: { name: "Alex", connected: true } } },
+      match: {
+        code,
+        phase: "waiting",
+        seats: { creator: { name: "Alex", connected: true } },
+        positions: { creator: 0, joiner: 0 },
+        currentPlayer: null,
+        winner: null,
+        lastTurn: null,
+      },
     });
 
     const [, samWelcome] = await TestSocket.hello(code, newToken(), "Sam");
+    if (samWelcome.type !== "welcome") throw new Error("not welcomed");
     const both = {
       code,
       phase: "in_progress",
@@ -23,7 +32,12 @@ describe("joining a Match over WebSocket", () => {
         creator: { name: "Alex", connected: true },
         joiner: { name: "Sam", connected: true },
       },
+      positions: { creator: 0, joiner: 0 },
+      currentPlayer: samWelcome.match.currentPlayer,
+      winner: null,
+      lastTurn: null,
     };
+    expect(["creator", "joiner"]).toContain(both.currentPlayer);
     expect(samWelcome).toEqual({ type: "welcome", you: "joiner", match: both });
     expect(await alexSocket.next()).toEqual({ type: "update", event: "joined", match: both });
   });

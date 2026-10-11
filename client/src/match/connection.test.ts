@@ -5,6 +5,7 @@ import { connectToMatch, matchSocketUrl } from "./connection";
 class FakeSocket extends EventTarget {
   sent: string[] = [];
   closedWith?: number;
+  readyState: number = WebSocket.CONNECTING;
   constructor(readonly url: string) {
     super();
   }
@@ -16,6 +17,7 @@ class FakeSocket extends EventTarget {
   }
   // Test controls
   serverOpens() {
+    this.readyState = WebSocket.OPEN;
     this.dispatchEvent(new Event("open"));
   }
   serverSends(message: ServerMessage) {
@@ -30,7 +32,15 @@ const hello: ClientMessage = { type: "hello", token: "0b6f3a52-5d0e-4f43-9a63", 
 const welcome: ServerMessage = {
   type: "welcome",
   you: "creator",
-  match: { code: "K7QXM", phase: "waiting", seats: { creator: { name: "Alex", connected: true } } },
+  match: {
+    code: "K7QXM",
+    phase: "waiting",
+    seats: { creator: { name: "Alex", connected: true } },
+    positions: { creator: 0, joiner: 0 },
+    currentPlayer: null,
+    winner: null,
+    lastTurn: null,
+  },
 };
 
 function setup() {
@@ -115,6 +125,17 @@ describe("connectToMatch", () => {
     vi.advanceTimersByTime(10_000);
     expect(sockets).toHaveLength(1);
     expect(handlers.onLost).toHaveBeenCalledOnce();
+  });
+});
+
+describe("Connection.send", () => {
+  it("sends on an open socket and drops messages while connecting", () => {
+    const { connection, last } = setup();
+    connection.send({ type: "roll" });
+    expect(last().sent).toEqual([]);
+    last().serverOpens();
+    connection.send({ type: "roll" });
+    expect(last().sent).toEqual([JSON.stringify(hello), JSON.stringify({ type: "roll" })]);
   });
 });
 

@@ -75,3 +75,15 @@ export class TestSocket {
     this.ws.close(1000, "test done");
   }
 }
+
+/** Alex creates a Match, Sam joins, and Alex's "joined" update is already consumed. */
+export async function seatedPair() {
+  const alex = newToken();
+  const sam = newToken();
+  const code = await createMatch(alex, "Alex");
+  const [alexSocket] = await TestSocket.hello(code, alex, "Alex");
+  const [samSocket, samWelcome] = await TestSocket.hello(code, sam, "Sam");
+  const joined = await alexSocket.next();
+  if (samWelcome.type !== "welcome" || joined.type !== "update") throw new Error("not seated");
+  return { code, alex, sam, alexSocket, samSocket, start: joined.match };
+}

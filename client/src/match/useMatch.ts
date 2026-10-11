@@ -1,11 +1,15 @@
-import { useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import type { Identity } from "../identity";
-import { connectToMatch, matchSocketUrl } from "./connection";
+import { connectToMatch, matchSocketUrl, type Connection } from "./connection";
 import { initialMatchState, matchReducer, type MatchState } from "./state";
 
-/** Connects to the Match while `code` is set; returns what the Match screen shows. */
-export function useMatch(code: string | null, identity: Identity): MatchState {
+/** Connects to the Match while `code` is set; returns what the Match screen shows and a way to Roll. */
+export function useMatch(
+  code: string | null,
+  identity: Identity,
+): { state: MatchState; roll: () => void } {
   const [state, dispatch] = useReducer(matchReducer, initialMatchState);
+  const connectionRef = useRef<Connection | null>(null);
 
   useEffect(() => {
     if (!code) return;
@@ -22,8 +26,13 @@ export function useMatch(code: string | null, identity: Identity): MatchState {
         onReplaced: () => dispatch({ type: "replaced" }),
       },
     );
-    return () => connection.close();
+    connectionRef.current = connection;
+    return () => {
+      connection.close();
+      connectionRef.current = null;
+    };
   }, [code, identity]);
 
-  return state;
+  const roll = useCallback(() => connectionRef.current?.send({ type: "roll" }), []);
+  return { state, roll };
 }
