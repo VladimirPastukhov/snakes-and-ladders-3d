@@ -210,6 +210,8 @@ body {
 .play .turn {
   align-items: center;
   justify-content: space-between;
+  /* As tall as the Roll button, so the panel (and the Board above it) keeps its size each Turn. */
+  min-height: 44px;
 }
 
 .play .turn p,
@@ -226,6 +228,7 @@ body {
 
 .play button.roll {
   min-width: 96px;
+  height: 44px;
   font-size: 18px;
 }
 

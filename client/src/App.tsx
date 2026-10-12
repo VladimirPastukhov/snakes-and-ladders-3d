@@ -6,6 +6,7 @@ import { Identity } from "./identity";
 import { createMatch } from "./match/api";
 import { isReconnecting } from "./match/state";
 import { useMatch } from "./match/useMatch";
+import { usePlayback } from "./match/usePlayback";
 import { matchPath, navigate, useRoute } from "./route";
 import { HomePanel } from "./screens/HomePanel";
 import { MatchMessage } from "./screens/MatchMessage";
@@ -35,7 +36,9 @@ export function App({ identity: given }: { identity?: Identity } = {}) {
     code !== null && confirmed !== code && !(identity.name && identity.knowsMatch(code));
   const { state, roll } = useMatch(needsName ? null : code, identity);
 
-  const snapshot = code ? state.match : undefined;
+  // The Board shows the Match as far as the Turn animations have got, not the latest snapshot.
+  const playback = usePlayback({ ...state, match: code ? state.match : undefined });
+  const snapshot = playback.shown;
   // A stable key, so the Board only redraws Tokens when a Seat or a position changes.
   const tokensKey = snapshot
     ? SEATS.filter((seat) => snapshot.seats[seat])
@@ -76,7 +79,9 @@ export function App({ identity: given }: { identity?: Identity } = {}) {
   } else if (state.match && state.you && (state.status === "seated" || isReconnecting(state))) {
     panel = (
       <MatchPanel
-        match={state.match}
+        match={snapshot ?? state.match}
+        latest={state.match}
+        busy={playback.busy}
         you={state.you}
         reconnecting={isReconnecting(state)}
         onRoll={roll}
@@ -90,7 +95,11 @@ export function App({ identity: given }: { identity?: Identity } = {}) {
   return (
     <main className="app">
       {webgl ? (
-        <BoardScene tokens={tokens} />
+        <BoardScene
+          tokens={tokens}
+          playing={playback.playing}
+          lastTurn={snapshot?.lastTurn ?? null}
+        />
       ) : (
         <p className="no-webgl" role="alert">
           This game needs 3D graphics (WebGL), which this browser has turned off or does not

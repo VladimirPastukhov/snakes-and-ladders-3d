@@ -71,3 +71,79 @@ export function fitCamera(
   place(far);
   return { camera, target, distance: far };
 }
+
+/** While following a Turn, the camera sits this share of the overview distance from its target. */
+export const FOLLOW_ZOOM = 0.55;
+/** How quickly the follow camera closes the gap to its goal, per second (exponential damping). */
+export const FOLLOW_RATE = 6;
+
+/**
+ * Follow camera: `follow` while a Turn plays, `return` while gliding back to the overview,
+ * `idle` otherwise. Once the Player drags or zooms, the camera is theirs until the next Turn.
+ */
+export type FollowMode = "idle" | "follow" | "return";
+export type FollowEvent = "turn_started" | "turn_ended" | "player_moved" | "arrived";
+
+export function nextFollowMode(mode: FollowMode, event: FollowEvent, reducedMotion: boolean) {
+  switch (event) {
+    case "turn_started":
+      return reducedMotion ? "idle" : "follow";
+    case "turn_ended":
+      return mode === "follow" ? "return" : mode;
+    case "player_moved":
+      return "idle";
+    case "arrived":
+      return mode === "return" ? "idle" : mode;
+  }
+}
+
+export interface CameraGoal {
+  target: Vector3;
+  distance: number;
+}
+
+/** Room kept around each followed object, so a whole Token or die stays on screen. */
+const FOLLOW_PADDING = 1;
+const FOLLOW_HEIGHT = 0.8;
+
+/**
+ * Where the camera aims while following: framing the moving Token and the die from the current
+ * angles, never closer than `FOLLOW_ZOOM` of the overview and never further than the overview.
+ */
+export function followGoal(
+  overview: CameraGoal,
+  followed: readonly Vector3[],
+  view: Required<View>,
+): CameraGoal {
+  if (followed.length === 0) return overview;
+  const points = followed.flatMap((p) =>
+    [-FOLLOW_PADDING, FOLLOW_PADDING].flatMap((dx) =>
+      [-FOLLOW_PADDING, FOLLOW_PADDING].flatMap((dz) =>
+        [0, FOLLOW_HEIGHT].map((dy) => new Vector3(p.x + dx, p.y + dy, p.z + dz)),
+      ),
+    ),
+  );
+  const fit = fitCamera(points, view);
+  const distance = Math.min(
+    overview.distance,
+    Math.max(overview.distance * FOLLOW_ZOOM, fit.distance),
+  );
+  return { target: fit.target, distance };
+}
+
+/** One damped step from `current` towards `goal`, `dt` seconds later; never overshoots. */
+export function stepToward(current: CameraGoal, goal: CameraGoal, dt: number): CameraGoal {
+  const k = 1 - Math.exp(-FOLLOW_RATE * dt);
+  return {
+    target: current.target.clone().lerp(goal.target, k),
+    distance: current.distance + (goal.distance - current.distance) * k,
+  };
+}
+
+/** True once `current` is close enough to `goal` to snap onto it. */
+export function hasArrived(current: CameraGoal, goal: CameraGoal): boolean {
+  return (
+    current.target.distanceTo(goal.target) < 0.01 &&
+    Math.abs(current.distance - goal.distance) < 0.01
+  );
+}

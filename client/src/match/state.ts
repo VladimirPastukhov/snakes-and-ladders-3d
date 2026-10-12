@@ -1,4 +1,4 @@
-import type { MatchSnapshot, Seat, ServerMessage } from "@sl/shared";
+import type { MatchEvent, MatchSnapshot, Seat, ServerMessage } from "@sl/shared";
 
 export type MatchStatus = "connecting" | "seated" | "full" | "not_found" | "replaced";
 
@@ -7,6 +7,8 @@ export interface MatchState {
   status: MatchStatus;
   you?: Seat;
   match?: MatchSnapshot;
+  /** How `match` arrived: a fresh `welcome` (load or reconnect) or the event of an `update`. */
+  arrival?: "welcome" | MatchEvent;
 }
 
 export type MatchAction =
@@ -27,9 +29,9 @@ export function matchReducer(state: MatchState, action: MatchAction): MatchState
       const { message } = action;
       switch (message.type) {
         case "welcome":
-          return { status: "seated", you: message.you, match: message.match };
+          return { status: "seated", you: message.you, match: message.match, arrival: "welcome" };
         case "update":
-          return { ...state, match: message.match };
+          return { ...state, match: message.match, arrival: message.event };
         case "rejected":
           return { status: message.reason };
       }

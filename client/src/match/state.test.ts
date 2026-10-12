@@ -17,7 +17,7 @@ const both: MatchSnapshot = {
   seats: { ...waiting.seats, joiner: { name: "Sam", connected: true } },
 };
 
-const seated: MatchState = { status: "seated", you: "creator", match: waiting };
+const seated: MatchState = { status: "seated", you: "creator", match: waiting, arrival: "welcome" };
 
 describe("matchReducer", () => {
   it("starts out connecting", () => {
@@ -38,7 +38,20 @@ describe("matchReducer", () => {
       type: "message",
       message: { type: "update", event: "joined", match: both },
     });
-    expect(state).toEqual({ status: "seated", you: "creator", match: both });
+    expect(state).toEqual({ status: "seated", you: "creator", match: both, arrival: "joined" });
+  });
+
+  it("records a rolled update, and welcome again after a reconnect", () => {
+    const rolled = matchReducer(seated, {
+      type: "message",
+      message: { type: "update", event: "rolled", match: both },
+    });
+    expect(rolled.arrival).toBe("rolled");
+    const back = matchReducer(
+      { ...rolled, status: "connecting" },
+      { type: "message", message: { type: "welcome", you: "creator", match: both } },
+    );
+    expect(back.arrival).toBe("welcome");
   });
 
   it.each(["full", "not_found"] as const)("shows %s when rejected", (reason) => {

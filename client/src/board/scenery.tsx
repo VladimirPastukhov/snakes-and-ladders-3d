@@ -2,9 +2,8 @@ import { Text } from "@react-three/drei";
 import fredokaUrl from "@fontsource/fredoka/files/fredoka-latin-600-normal.woff?url";
 import type { Seat } from "@sl/shared";
 import { COLORS, REGIONS, SEAT_LOOK, regionOf } from "./oz";
-import type { Road } from "./road";
-
-const SLAB_HEIGHT = 0.18;
+import { SLAB_HEIGHT, type Road } from "./road";
+import { tokenSpot } from "./turnMotion";
 
 /** Neutral land plus a patch of Region colour under every Cell. */
 export function Ground({ road }: { road: Road }) {
@@ -17,7 +16,7 @@ export function Ground({ road }: { road: Road }) {
   return (
     <group>
       <mesh rotation-x={-Math.PI / 2} position-y={-0.01}>
-        <planeGeometry args={[20, 26]} />
+        <planeGeometry args={[60, 70]} />
         <meshLambertMaterial color={COLORS.baseGround} />
       </mesh>
       {patches.map(({ position, region }, i) => (
@@ -122,7 +121,17 @@ export function Landmarks({ road }: { road: Road }) {
   );
 }
 
-function Pawn({ color, x, y, z }: { color: string; x: number; y: number; z: number }) {
+export function Pawn({
+  color,
+  x = 0,
+  y = 0,
+  z = 0,
+}: {
+  color: string;
+  x?: number;
+  y?: number;
+  z?: number;
+}) {
   return (
     <group position={[x, y, z]}>
       <mesh position-y={0.2}>
@@ -145,26 +154,26 @@ export interface TokenSpot {
 
 /**
  * Each Token on its Cell (or at Start), on its own side of the road, so two Tokens on one
- * Cell stand side by side and the Cell number between them stays readable.
+ * Cell stand side by side and the Cell number between them stays readable. The `moving` Seat's
+ * Token is left out: the Turn's animation draws it.
  */
-export function Tokens({ road, tokens }: { road: Road; tokens: readonly TokenSpot[] }) {
-  const offset = road.cellSize * 0.32;
-  const sign: Record<Seat, number> = { creator: 1, joiner: -1 };
+export function Tokens({
+  road,
+  tokens,
+  moving,
+}: {
+  road: Road;
+  tokens: readonly TokenSpot[];
+  moving?: Seat | null;
+}) {
   return (
     <group>
-      {tokens.map(({ seat, cell }) => {
-        const { position, tangent } = cell === 0 ? road.start : road.cells[cell - 1]!;
-        const side = { x: -tangent.z * offset * sign[seat], z: tangent.x * offset * sign[seat] };
-        return (
-          <Pawn
-            key={seat}
-            color={SEAT_LOOK[seat].color}
-            x={position.x + side.x}
-            y={cell === 0 ? 0 : SLAB_HEIGHT}
-            z={position.z + side.z}
-          />
-        );
-      })}
+      {tokens
+        .filter(({ seat }) => seat !== moving)
+        .map(({ seat, cell }) => {
+          const spot = tokenSpot(road, seat, cell);
+          return <Pawn key={seat} color={SEAT_LOOK[seat].color} x={spot.x} y={spot.y} z={spot.z} />;
+        })}
     </group>
   );
 }
