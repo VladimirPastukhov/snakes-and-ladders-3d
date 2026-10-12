@@ -35,6 +35,8 @@
 
   Unit-test the pure easing and the "taken over" decision. Verify `pnpm test` passes and, in `pnpm dev`, a Turn zooms in and returns.
 
+- [x] 3.2 Make each Snake's and Ladder's direction obvious: arrowheads spaced along every arc, pointing along it towards the destination, and a ring in the arc's colour around the start Cell. Unit-test the arrowhead placement (evenly spaced, each pointing along the arc's tangent, none on the end Cells). Verify `pnpm test` passes and the phone screenshot reads clearly with all 30 Cell numbers still visible.
+
 ## 4. Panel reveal
 
 - [x] 4.1 Pass `shown` to `MatchPanel` and add a `busy` flag to `PlayControls`. Roll is enabled only on your Turn in `shown` and not busy; Space/Enter follow the same rule; the 3 s fallback watches the latest snapshot. jsdom tests:

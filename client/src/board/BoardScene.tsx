@@ -186,7 +186,7 @@ export function BoardScene({ tokens, playing = null, lastTurn = null }: BoardSce
           lastTurn={lastTurn}
           liveRef={liveRef}
         />
-        <JumpArcs arcs={arcs} />
+        <JumpArcs road={road} arcs={arcs} />
         <Suspense fallback={null}>
           <Cells road={road} />
           <ReadySignal onReady={() => setReady(true)} />

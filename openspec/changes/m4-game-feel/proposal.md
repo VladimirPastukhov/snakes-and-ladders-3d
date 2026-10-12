@@ -9,6 +9,7 @@ M3 made the game playable, but a Turn happens in one frame: the Token teleports 
 - **Dice tumble:** after a Roll, a 3D die drops onto the Board beside the rolling Token. It tumbles for about a second and comes to rest with the rolled number facing up, on both screens.
 - **Cell-by-cell hops:** the Token then hops along the road one Cell at a time, so a 4 is four visible hops. A Move that would pass the Final Cell stops there.
 - **Generic Jump flight:** when the Move ends on a Snake or Ladder, the Token flies along that Snake's or Ladder's glowing arc to its destination Cell. Ladders and Snakes look the same here; themed Jumps are M5.
+- **Clearer Snake and Ladder direction:** arrowheads along every arc point to its destination, and the Cell where a Jump starts is ringed in the arc's colour. A player who lands on the top of a Ladder should be able to see at a glance that nothing happens there.
 - **Follow camera:** during the animation the camera glides closer and follows the moving Token, then glides back to the whole-Board view. If a Player drags or zooms meanwhile, following stops for the rest of that Turn.
 - **Hold the result until the animation ends:** the last-Turn line, the "Your Turn" / "<name>'s Turn" line, the Roll button and the Winner banner change only once the Turn's animation has finished. This changes the M3 promise "within 2 seconds both screens show the result": the die must start tumbling within 1 second and both screens must have settled within 6 seconds.
 - **No animation when it would not help:**
@@ -25,7 +26,7 @@ Out of scope: Event Names, character Tokens and themed Jumps (M5); sound; a sett
 - `turn-animation`: how a played Turn is shown on the Board, covering the die tumble, hops, Jump flight, follow camera, and when animation is skipped.
 
 ### Modified Capabilities
-- `board-view`: Tokens no longer move "as soon as a Turn is played". They reach their new Cell through the Turn's animation, and stand still where they are on load or reconnect.
+- `board-view`: each Snake's and Ladder's direction is shown along its whole arc and at its start Cell. Tokens no longer move "as soon as a Turn is played". They reach their new Cell through the Turn's animation, and stand still where they are on load or reconnect.
 - `match-play`: Turn text, Roll button and Winner announcement update only when the Turn's animation has finished, and the timing promise moves from "within 2 seconds" to "starts within 1 s, settled within 6 s".
 
 ## Impact

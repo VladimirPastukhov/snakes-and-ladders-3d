@@ -2,6 +2,25 @@
 
 ## MODIFIED Requirements
 
+### Requirement: Snakes and Ladders are drawn as glowing arcs
+Each Snake and Ladder SHALL be drawn as a glowing arc from its start Cell to its end Cell, with a marker showing which end is the destination. Its direction SHALL be readable anywhere along the arc: arrowheads along the arc SHALL point towards the destination, and the start Cell SHALL be ringed in the arc's colour. Ladders and Snakes SHALL use clearly different colours that do not rely on red/green alone.
+
+#### Scenario: Reading a Ladder
+- **WHEN** a player looks at the arc between Cells 3 and 11
+- **THEN** it is in the Ladder colour and its destination marker is at Cell 11
+
+#### Scenario: Reading a Snake
+- **WHEN** a player looks at the arc between Cells 27 and 19
+- **THEN** it is in the Snake colour and its destination marker is at Cell 19
+
+#### Scenario: Reading the direction from the middle of an arc
+- **WHEN** a player sees only the middle part of the arc between Cells 3 and 11
+- **THEN** the arrowheads on it point towards Cell 11
+
+#### Scenario: Where a Jump starts
+- **WHEN** a player looks at Cells 3 and 11
+- **THEN** Cell 3 is ringed in the Ladder colour and Cell 11 is not ringed, so landing on 3 climbs and landing on 11 does nothing
+
 ### Requirement: Tokens appear for taken Seats
 The Board SHALL show a Token for each Seat that a Player holds: orange for the Match creator (Dorothy) and blue for the joiner (Scarecrow). Each Token SHALL stand on its Player's current Cell, or at Start before its first Move. When a Turn is played, the Token SHALL reach its new Cell through that Turn's animation; when the page opens or reconnects, Tokens SHALL appear straight on their current Cells. Two Tokens on the same Cell or both at Start SHALL stand side by side without overlapping. Outside a Match, the Board SHALL show no Tokens.
 
