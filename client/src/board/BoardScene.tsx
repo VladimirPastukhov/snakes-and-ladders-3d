@@ -9,14 +9,13 @@ import {
   useState,
   type ComponentRef,
 } from "react";
-import type { Seat } from "@sl/shared";
 import { Vector3 } from "three";
 import { buildArcs, type JumpArc } from "./arcs";
 import { CAMERA_FOV, ORBIT_LIMITS, fitCamera } from "./camera";
 import { DebugHook } from "./debug";
 import { JumpArcs } from "./JumpArcs";
 import { buildRoad, type Road } from "./road";
-import { Cells, Ground, Landmarks, Path, Tokens } from "./scenery";
+import { Cells, Ground, Landmarks, Path, Tokens, type TokenSpot } from "./scenery";
 
 /** Frames the whole Board for the current window, and again whenever it is resized. */
 function CameraRig({ road }: { road: Road }) {
@@ -83,8 +82,8 @@ function ReadySignal({ onReady }: { onReady: () => void }) {
   return null;
 }
 
-/** The Board, with a Token for each seat in `seats`. */
-export function BoardScene({ seats }: { seats: readonly Seat[] }) {
+/** The Board, with the given Tokens on their Cells. */
+export function BoardScene({ tokens }: { tokens: readonly TokenSpot[] }) {
   const road = useMemo(() => buildRoad(), []);
   const arcs: JumpArc[] = useMemo(() => buildArcs(road), [road]);
   const [ready, setReady] = useState(false);
@@ -99,13 +98,13 @@ export function BoardScene({ seats }: { seats: readonly Seat[] }) {
         <Ground road={road} />
         <Path road={road} />
         <Landmarks road={road} />
-        <Tokens road={road} seats={seats} />
+        <Tokens road={road} tokens={tokens} />
         <JumpArcs arcs={arcs} />
         <Suspense fallback={null}>
           <Cells road={road} />
           <ReadySignal onReady={() => setReady(true)} />
         </Suspense>
-        {import.meta.env.DEV && <DebugHook road={road} arcs={arcs} tokens={seats} />}
+        {import.meta.env.DEV && <DebugHook road={road} arcs={arcs} tokens={tokens} />}
       </Canvas>
     </div>
   );

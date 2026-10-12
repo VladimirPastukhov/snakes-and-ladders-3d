@@ -2,11 +2,14 @@ import { SEATS, type MatchSnapshot, type Seat } from "@sl/shared";
 import { useRef, useState } from "react";
 import { SEAT_LOOK } from "../board/oz";
 import { matchPath } from "../route";
+import { PlayControls } from "./PlayControls";
 
 export interface MatchPanelProps {
   match: MatchSnapshot;
   you: Seat;
   reconnecting: boolean;
+  onRoll: () => void;
+  onHome: () => void;
   origin?: string;
 }
 
@@ -15,6 +18,8 @@ export function MatchPanel({
   match,
   you,
   reconnecting,
+  onRoll,
+  onHome,
   origin = window.location.origin,
 }: MatchPanelProps) {
   const link = origin + matchPath(match.code);
@@ -39,6 +44,7 @@ export function MatchPanel({
           Reconnecting…
         </p>
       )}
+      <PlayControls match={match} you={you} onRoll={onRoll} onHome={onHome} />
       <p className="code">
         Match Code <strong data-testid="match-code">{match.code}</strong>
       </p>

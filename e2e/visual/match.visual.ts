@@ -12,8 +12,12 @@ async function newPlayer(browser: Browser): Promise<[BrowserContext, Page]> {
   return [context, await context.newPage()];
 }
 
+type TokenSpot = { seat: string; cell: number };
+
 const tokens = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __board?: { tokens: string[] } }).__board?.tokens);
+  page.evaluate(() => (window as unknown as { __board?: { tokens: TokenSpot[] } }).__board?.tokens);
+
+const atStart = (...seats: string[]) => seats.map((seat) => ({ seat, cell: 0 }));
 
 const seat = (page: Page, name: "creator" | "joiner") => page.locator(`[data-seat="${name}"]`);
 
@@ -48,7 +52,7 @@ test("two Players meet, leave and come back", async ({ browser }) => {
   const code = await createMatch(alex, "Alex");
   await expect(seat(alex, "creator")).toContainText("Alex (you)");
   await expect(seat(alex, "joiner")).toContainText("Waiting for a friend…");
-  await expect.poll(() => tokens(alex)).toEqual(["creator"]);
+  await expect.poll(() => tokens(alex)).toEqual(atStart("creator"));
   await alex.getByRole("button", { name: "Copy link" }).click();
   const link = await alex.evaluate(() => navigator.clipboard.readText());
   expect(link).toBe(new URL(`/m/${code}`, alex.url()).href);
@@ -58,8 +62,8 @@ test("two Players meet, leave and come back", async ({ browser }) => {
   await joinByLink(sam, code, "Sam");
   await expectBothConnected(sam);
   await expectBothConnected(alex);
-  await expect.poll(() => tokens(alex)).toEqual(["creator", "joiner"]);
-  await expect.poll(() => tokens(sam)).toEqual(["creator", "joiner"]);
+  await expect.poll(() => tokens(alex)).toEqual(atStart("creator", "joiner"));
+  await expect.poll(() => tokens(sam)).toEqual(atStart("creator", "joiner"));
   await expect(seat(sam, "joiner")).toContainText("Sam (you)");
   await alex.screenshot({ path: "visual-output/match-creator.png" });
   await sam.screenshot({ path: "visual-output/match-joiner.png" });

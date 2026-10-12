@@ -17,10 +17,18 @@ export type CreateMatchResponse = z.infer<typeof createMatchResponseSchema>;
 // Client → server, sent on every (re)connect.
 export const clientMessageSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("hello"), token: sessionTokenSchema, name: displayNameSchema }),
+  // Ask to Roll; the server throws the die, and ignores it unless it is the sender's Turn.
+  z.object({ type: z.literal("roll") }),
 ]);
 export type ClientMessage = z.infer<typeof clientMessageSchema>;
 
-export const matchEventSchema = z.enum(["joined", "connected", "disconnected", "renamed"]);
+export const matchEventSchema = z.enum([
+  "joined",
+  "connected",
+  "disconnected",
+  "renamed",
+  "rolled",
+]);
 export type MatchEvent = z.infer<typeof matchEventSchema>;
 
 export const rejectReasonSchema = z.enum(["full", "not_found"]);

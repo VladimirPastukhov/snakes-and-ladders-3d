@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 // Mirrors the shape of `window.__board` (client/src/board/debug.tsx); only the fields used here.
 interface BoardDebug {
   cells: { cell: number; onScreen: boolean }[];
-  tokens: string[];
+  tokens: unknown[];
 }
 
 const VIEWPORTS = [

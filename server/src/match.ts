@@ -2,24 +2,38 @@ import { DurableObject } from "cloudflare:workers";
 import {
   REPLACED_CLOSE_CODE,
   SEATS,
+  WAITING_GAME,
   parseClientMessage,
+  startGame,
+  takeTurn,
+  type ClientMessage,
+  type GameState,
   type MatchEvent,
-  type MatchPhase,
   type MatchSnapshot,
   type RejectReason,
   type Seat,
   type ServerMessage,
 } from "@sl/shared";
+import { pickFirst, rollDie } from "./dice";
 
 interface StoredSeat {
   tokenHash: string;
   name: string;
 }
 
-interface StoredMatch {
+interface StoredMatch extends GameState {
   code: string;
-  phase: MatchPhase;
   seats: Partial<Record<Seat, StoredSeat>>;
+}
+
+/** Matches stored before M3 have no game fields. */
+type StoredBeforeM3 = Pick<StoredMatch, "code" | "phase" | "seats">;
+
+/** Gives an M2 Match its Tokens at Start, and a first Current Player if it is In progress. */
+function upgrade(stored: StoredMatch | StoredBeforeM3): { match: StoredMatch; changed: boolean } {
+  if ("positions" in stored) return { match: stored, changed: false };
+  const game = stored.phase === "in_progress" ? startGame(pickFirst()) : WAITING_GAME;
+  return { match: { ...game, code: stored.code, seats: stored.seats }, changed: true };
 }
 
 // Kept on each socket, so it survives hibernation. Empty until the socket says hello.
@@ -55,7 +69,14 @@ export class Match extends DurableObject<Env> {
 
   private async load(): Promise<StoredMatch | null> {
     if (this.match === undefined) {
-      this.match = (await this.ctx.storage.get<StoredMatch>(MATCH_KEY)) ?? null;
+      const stored = await this.ctx.storage.get<StoredMatch | StoredBeforeM3>(MATCH_KEY);
+      if (!stored) {
+        this.match = null;
+      } else {
+        const { match, changed } = upgrade(stored);
+        this.match = match;
+        if (changed) await this.ctx.storage.put(MATCH_KEY, match);
+      }
     }
     return this.match;
   }
@@ -69,7 +90,7 @@ export class Match extends DurableObject<Env> {
   async create(code: string, token: string, name: string): Promise<boolean> {
     const tokenHash = await hashToken(token);
     if (await this.load()) return false;
-    await this.save({ code, phase: "waiting", seats: { creator: { tokenHash, name } } });
+    await this.save({ ...WAITING_GAME, code, seats: { creator: { tokenHash, name } } });
     return true;
   }
 
@@ -84,11 +105,19 @@ export class Match extends DurableObject<Env> {
   }
 
   override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
-    const hello = typeof message === "string" ? parseClientMessage(message) : null;
-    if (!hello) {
+    const parsed = typeof message === "string" ? parseClientMessage(message) : null;
+    if (!parsed) {
       ws.close(1007, "Invalid message");
       return;
     }
+    if (parsed.type === "roll") return this.roll(ws);
+    return this.hello(ws, parsed);
+  }
+
+  private async hello(
+    ws: WebSocket,
+    hello: Extract<ClientMessage, { type: "hello" }>,
+  ): Promise<void> {
     // Hash before loading: after load() every step up to save() runs without yielding.
     const tokenHash = await hashToken(hello.token);
     const match = await this.load();
@@ -113,7 +142,7 @@ export class Match extends DurableObject<Env> {
       event = "joined";
       await this.save({
         ...match,
-        phase: "in_progress",
+        ...startGame(pickFirst()),
         seats: { ...match.seats, joiner: { tokenHash, name: hello.name } },
       });
     } else {
@@ -124,6 +153,17 @@ export class Match extends DurableObject<Env> {
     const snapshot = this.snapshot(this.match!);
     send(ws, { type: "welcome", you: seat, match: snapshot });
     if (event) this.broadcast({ type: "update", event, match: snapshot }, ws);
+  }
+
+  /** Plays a Turn if the sender is the Current Player; anything else is ignored. */
+  private async roll(ws: WebSocket): Promise<void> {
+    const seat = seatOf(ws);
+    const match = await this.load();
+    if (!seat || !match) return;
+    const result = takeTurn(match, seat, rollDie());
+    if (!result) return;
+    await this.save({ ...match, ...result.state });
+    this.broadcast({ type: "update", event: "rolled", match: this.snapshot(this.match!) });
   }
 
   override async webSocketClose(ws: WebSocket): Promise<void> {
@@ -181,7 +221,8 @@ export class Match extends DurableObject<Env> {
       const held = match.seats[seat];
       if (held) seats[seat] = { name: held.name, connected: this.isConnected(seat) };
     }
-    return { code: match.code, phase: match.phase, seats };
+    const { code, phase, positions, currentPlayer, winner, lastTurn } = match;
+    return { code, phase, seats, positions, currentPlayer, winner, lastTurn };
   }
 
   private broadcast(message: ServerMessage, except?: WebSocket): void {
