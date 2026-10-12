@@ -51,6 +51,9 @@ const CONTROL_POINTS: readonly [number, number][] = [
   [2.8, -7.9],
 ];
 
+/** Height of a Cell slab; Tokens on a Cell stand on top of it. */
+export const SLAB_HEIGHT = 0.18;
+
 /** Fraction of the spacing between Cell centres that a slab covers. */
 const CELL_FILL = 0.82;
 

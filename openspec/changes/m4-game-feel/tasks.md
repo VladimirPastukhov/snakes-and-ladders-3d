@@ -2,8 +2,8 @@
 
 ## 1. Playback model
 
-- [ ] 1.1 Record how each snapshot arrived (`arrival: "welcome" | <update event>`) in the match reducer, with reducer tests for welcome, rolled and presence updates; verify `pnpm test` passes
-- [ ] 1.2 Add `client/src/match/playback.ts` and a `usePlayback` hook. The hook keeps `shown`, the queue and the playing Turn, and finishes a Turn with a timer of the timeline's duration. Unit tests (fake timers):
+- [x] 1.1 Record how each snapshot arrived (`arrival: "welcome" | <update event>`) in the match reducer, with reducer tests for welcome, rolled and presence updates; verify `pnpm test` passes
+- [x] 1.2 Add `client/src/match/playback.ts` and a `usePlayback` hook. The hook keeps `shown`, the queue and the playing Turn, and finishes a Turn with a timer of the timeline's duration. Unit tests (fake timers):
   - welcome shows at once; `rolled` queues and reveals on finish;
   - two quick Turns play in order;
   - presence and rename pass straight into `shown`;
@@ -14,7 +14,7 @@
 
 ## 2. Turn motion
 
-- [ ] 2.1 Add `client/src/board/turnMotion.ts` (timeline with tumble 900 ms, 280 ms per hop, 150 ms pause, 900 ms flight; `tokenAt`, `dieAt`). Unit tests:
+- [x] 2.1 Add `client/src/board/turnMotion.ts` (timeline with tumble 900 ms, 280 ms per hop, 150 ms pause, 900 ms flight; `tokenAt`, `dieAt`). Unit tests:
   - one hop per Cell, each ending on the Seat's spot of that Cell;
   - Start → Cell 1;
   - 28 + 5 stops at 30;
@@ -23,11 +23,11 @@
   - the die's resting top face equals the Roll for every value 1–6.
 
   Verify `pnpm test` passes.
-- [ ] 2.2 Draw the motion: a code-built `Die` (rounded cube with pips), `Tokens` drawing the moving Seat from `tokenAt`, and a `TurnPlayer` that animates and calls `invalidate()` only while a Turn plays. Wire `shown` and `playing` from `App` into `BoardScene`. Extend `window.__board` with `animating`, `die` and `following`. Verify with `pnpm typecheck` and the existing visual checks.
+- [x] 2.2 Draw the motion: a code-built `Die` (rounded cube with pips), `Tokens` drawing the moving Seat from `tokenAt`, and a `TurnPlayer` that animates and calls `invalidate()` only while a Turn plays. Wire `shown` and `playing` from `App` into `BoardScene`. Extend `window.__board` with `animating`, `die` and `following`. Verify with `pnpm typecheck` and the existing visual checks.
 
 ## 3. Follow camera
 
-- [ ] 3.1 Add follow mode to `CameraRig`:
+- [x] 3.1 Add follow mode to `CameraRig`:
   - it eases the target towards the moving Token and die, and the distance to 0.55× the overview, at the current angles;
   - it glides back to the overview fit afterwards;
   - an OrbitControls `start` event stops following for the rest of the Turn;
@@ -37,7 +37,7 @@
 
 ## 4. Panel reveal
 
-- [ ] 4.1 Pass `shown` to `MatchPanel` and add a `busy` flag to `PlayControls`. Roll is enabled only on your Turn in `shown` and not busy; Space/Enter follow the same rule; the 3 s fallback watches the latest snapshot. jsdom tests:
+- [x] 4.1 Pass `shown` to `MatchPanel` and add a `busy` flag to `PlayControls`. Roll is enabled only on your Turn in `shown` and not busy; Space/Enter follow the same rule; the 3 s fallback watches the latest snapshot. jsdom tests:
   - the old Turn line and last Turn stay while busy;
   - Roll stays disabled past 3 s while busy;
   - the Winner is not announced until the winning Turn is revealed;
@@ -47,17 +47,17 @@
 
 ## 5. End-to-end checks
 
-- [ ] 5.1 Add `e2e/visual/animation.visual.ts` with three cases:
+- [x] 5.1 Add `e2e/visual/animation.visual.ts` with three cases:
   - **One Roll with motion:** `animating` becomes true, `following` is true, and the panel still shows the previous Turn line. Save a mid-tumble screenshot at phone size. Afterwards the camera is back at the overview distance with all 30 Cells on screen, the die's value matches the last-Turn text, and Tokens match it.
   - **Reload mid-Match:** `animating` never becomes true.
   - **Reduced-motion context:** nothing animates and the panel updates at once.
 
   Verify it passes.
-- [ ] 5.2 Run `play.visual.ts` in reduced-motion contexts so the full game stays fast, and raise the smoke test's per-Turn expectations to 10 s with real motion. Verify `pnpm visual` passes and `pnpm smoke` passes locally against `wrangler dev` with a built client.
+- [x] 5.2 Run `play.visual.ts` in reduced-motion contexts so the full game stays fast, and raise the smoke test's per-Turn expectations to 10 s with real motion. Verify `pnpm visual` passes and `pnpm smoke` passes locally against `wrangler dev` with a built client.
 
 ## 6. Docs
 
-- [ ] 6.1 Update `README.md`:
+- [x] 6.1 Update `README.md`:
   - how a Turn is shown: die, hops, Jump flight, follow camera;
   - when animation is skipped: reload/reconnect, reduced motion, hidden tab;
   - the new `window.__board` fields.

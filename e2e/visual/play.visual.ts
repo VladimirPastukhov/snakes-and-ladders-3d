@@ -1,7 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
 // Two Players (separate browser contexts) play a whole Match. The die is random, so the test
-// presses Roll on whichever page shows it until someone wins.
+// presses Roll on whichever page shows it until someone wins. Both devices ask for reduced
+// motion, so Turns are shown without animation and the long game stays fast; animation.visual.ts
+// covers the animated Turn.
 
 const PHONE = { width: 390, height: 844 };
 const MAX_PRESSES = 300;
@@ -16,8 +18,8 @@ const rollButton = (page: Page) => page.getByRole("button", { name: "Roll" });
 
 test("two Players play a whole Match to a Winner", async ({ browser }) => {
   test.setTimeout(240_000);
-  const alexContext = await browser.newContext({ viewport: PHONE });
-  const samContext = await browser.newContext({ viewport: PHONE });
+  const alexContext = await browser.newContext({ viewport: PHONE, reducedMotion: "reduce" });
+  const samContext = await browser.newContext({ viewport: PHONE, reducedMotion: "reduce" });
   const alex = await alexContext.newPage();
   const sam = await samContext.newPage();
   const players = [

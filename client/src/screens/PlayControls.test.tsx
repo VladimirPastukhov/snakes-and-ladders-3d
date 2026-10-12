@@ -1,6 +1,9 @@
-import type { MatchSnapshot } from "@sl/shared";
+import type { MatchSnapshot, Seat, Turn } from "@sl/shared";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { turnDuration } from "../board/turnMotion";
+import type { MatchState } from "../match/state";
+import { usePlayback } from "../match/usePlayback";
 import { PlayControls, ROLL_RETRY_MS } from "./PlayControls";
 
 const base: MatchSnapshot = {
@@ -150,4 +153,130 @@ it("shows nothing while the Match is Waiting", () => {
     />,
   );
   expect(container).toBeEmptyDOMElement();
+});
+
+describe("while a Turn animates", () => {
+  // Wired like App: the panel shows the playback's `shown` snapshot.
+  function Harness({
+    state,
+    you,
+    onRoll = () => {},
+  }: {
+    state: MatchState;
+    you: Seat;
+    onRoll?: () => void;
+  }) {
+    const { shown, busy } = usePlayback(state);
+    if (!shown) return null;
+    return (
+      <PlayControls
+        match={shown}
+        latest={state.match}
+        busy={busy}
+        you={you}
+        onRoll={onRoll}
+        onHome={() => {}}
+      />
+    );
+  }
+
+  const seated = (match: MatchSnapshot, arrival: MatchState["arrival"]): MatchState => ({
+    status: "seated",
+    you: "creator",
+    match,
+    arrival,
+  });
+  const turn: Turn = { seat: "creator", roll: 4, from: 0, landed: 4, to: 4, jump: null };
+  const afterRoll: MatchSnapshot = {
+    ...base,
+    positions: { creator: 4, joiner: 0 },
+    currentPlayer: "joiner",
+    lastTurn: turn,
+  };
+  // Alex's Turn just before: Alex is on 26, then rolls 4 to win.
+  const nearEnd: MatchSnapshot = { ...base, positions: { creator: 26, joiner: 9 } };
+  const winningTurn: Turn = { seat: "creator", roll: 4, from: 26, landed: 30, to: 30, jump: null };
+  const won: MatchSnapshot = {
+    ...nearEnd,
+    phase: "finished",
+    positions: { creator: 30, joiner: 9 },
+    currentPlayer: null,
+    winner: "creator",
+    lastTurn: winningTurn,
+  };
+
+  let reduced = false;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    reduced = false;
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: reduced, media: query }));
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  function play(before: MatchSnapshot, after: MatchSnapshot, you: Seat) {
+    const view = render(<Harness state={seated(before, "welcome")} you={you} />);
+    view.rerender(<Harness state={seated(after, "rolled")} you={you} />);
+    return view;
+  }
+
+  it("keeps the old Turn line and last Turn until the animation ends", () => {
+    play(base, afterRoll, "joiner");
+    expect(screen.getByTestId("turn")).toHaveTextContent("Alex's Turn");
+    expect(screen.queryByTestId("last-turn")).toBeNull();
+    expect(rollButton()).toBeNull();
+
+    act(() => vi.advanceTimersByTime(turnDuration(turn)));
+    expect(screen.getByTestId("turn")).toHaveTextContent("Your Turn");
+    expect(screen.getByTestId("last-turn")).toHaveTextContent("Alex rolled 4: Start → 4");
+    expect(rollButton()).toBeEnabled();
+  });
+
+  it("keeps the roller's Roll button disabled past the retry time while animating", () => {
+    // The longest Turn: a 6 that ends on the Snake at 27.
+    const snakeTurn: Turn = {
+      seat: "creator",
+      roll: 6,
+      from: 21,
+      landed: 27,
+      to: 19,
+      jump: "snake",
+    };
+    const before: MatchSnapshot = { ...base, positions: { creator: 21, joiner: 9 } };
+    const after: MatchSnapshot = {
+      ...before,
+      positions: { creator: 19, joiner: 9 },
+      currentPlayer: "joiner",
+      lastTurn: snakeTurn,
+    };
+    expect(turnDuration(snakeTurn)).toBeGreaterThan(ROLL_RETRY_MS + 100);
+    const onRoll = vi.fn();
+    const view = render(
+      <Harness state={seated(before, "welcome")} you="creator" onRoll={onRoll} />,
+    );
+    fireEvent.click(rollButton()!);
+    view.rerender(<Harness state={seated(after, "rolled")} you="creator" onRoll={onRoll} />);
+    expect(rollButton()).toBeDisabled();
+    act(() => vi.advanceTimersByTime(ROLL_RETRY_MS + 100));
+    expect(rollButton()).toBeDisabled();
+    press(" ");
+    expect(onRoll).toHaveBeenCalledOnce();
+    act(() => vi.advanceTimersByTime(turnDuration(snakeTurn)));
+    expect(screen.getByTestId("turn")).toHaveTextContent("Sam's Turn");
+  });
+
+  it("announces the Winner only when the winning Move has been shown", () => {
+    play(nearEnd, won, "joiner");
+    expect(screen.queryByText("Alex wins")).toBeNull();
+    act(() => vi.advanceTimersByTime(turnDuration(winningTurn) - 1));
+    expect(screen.queryByText("Alex wins")).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.getByText("Alex wins")).toBeInTheDocument();
+  });
+
+  it("reveals at once with reduced motion", () => {
+    reduced = true;
+    play(base, afterRoll, "joiner");
+    expect(screen.getByTestId("turn")).toHaveTextContent("Your Turn");
+    expect(screen.getByTestId("last-turn")).toHaveTextContent("Alex rolled 4");
+  });
 });

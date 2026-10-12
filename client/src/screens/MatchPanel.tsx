@@ -5,7 +5,12 @@ import { matchPath } from "../route";
 import { PlayControls } from "./PlayControls";
 
 export interface MatchPanelProps {
+  /** The Match as shown, which waits for each Turn's animation. */
   match: MatchSnapshot;
+  /** The latest snapshot from the server. */
+  latest?: MatchSnapshot;
+  /** True while a Turn is animating or waiting to. */
+  busy?: boolean;
   you: Seat;
   reconnecting: boolean;
   onRoll: () => void;
@@ -16,6 +21,8 @@ export interface MatchPanelProps {
 /** The Match screen: invite link, Match Code, and who sits in each seat. */
 export function MatchPanel({
   match,
+  latest,
+  busy,
   you,
   reconnecting,
   onRoll,
@@ -44,7 +51,14 @@ export function MatchPanel({
           Reconnecting…
         </p>
       )}
-      <PlayControls match={match} you={you} onRoll={onRoll} onHome={onHome} />
+      <PlayControls
+        match={match}
+        latest={latest}
+        busy={busy}
+        you={you}
+        onRoll={onRoll}
+        onHome={onHome}
+      />
       <p className="code">
         Match Code <strong data-testid="match-code">{match.code}</strong>
       </p>

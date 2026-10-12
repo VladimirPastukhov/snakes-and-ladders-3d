@@ -30,6 +30,24 @@ The messages are defined and validated with zod in `shared/src/protocol.ts`. A r
 
 The browser keeps the name and a random session token in `localStorage`; the token is never shown or put in a URL.
 
+### How a Turn is shown
+
+The server never waits for animations. Each screen animates a `rolled` Turn on its own, using the Turn record in the snapshot:
+
+1. **Die:** it tumbles onto the Board beside the rolling Token and lands with the rolled number on top.
+2. **Hops:** the Token hops one Cell at a time.
+3. **Jump:** on a Snake or Ladder, the Token flies along its arc.
+
+**Follow camera:** while a Turn plays, the camera glides closer and keeps the Token and die in view, then glides back to the whole Board. Dragging or zooming hands the camera to the Player until the next Turn.
+
+**When the panel updates:** the Turn line, last Turn, Roll button and Winner change only once the Turn has been shown. The client keeps a "shown" snapshot next to the latest one (`client/src/match/playback.ts`) and times the end of each Turn itself (`client/src/board/turnMotion.ts`, at most about 3.6 s), so the panel never depends on frames being drawn.
+
+**No animation (the Tokens just stand on their Cells):**
+
+- when a page opens or reconnects;
+- when the device asks for reduced motion;
+- for Turns that arrive while the tab is hidden.
+
 ## Prerequisites
 
 - Node.js 24 (see `.nvmrc`; `nvm use` picks it up)
@@ -69,7 +87,22 @@ Against production, CI also sets `EXPECTED_VERSION` to the deployed commit SHA.
 
 ### Visual checks
 
-Development builds expose `window.__board`: where every Cell and arc is on screen, the camera angle and distance, and which Tokens are drawn. Production builds strip it. The visual checks use it to assert that all 30 Cells are visible on a phone and on a desktop, and play two-Player Matches in separate browser contexts: joining, leaving, returning, second tab, full, not found, and a whole game to a Winner. Screenshots go to `e2e/visual-output/`:
+Development builds expose `window.__board`. Production builds strip it. It reports:
+
+- where every Cell and arc is on screen;
+- the camera's angle, its distance, and the distance of the whole-Board view;
+- which Tokens are drawn, where a moving Token reports the last Cell it reached;
+- whether a Turn is `animating`;
+- the `die` value and whether it is resting;
+- whether the camera is `following`.
+
+The visual checks use it to:
+
+- assert that all 30 Cells are visible on a phone and on a desktop;
+- play two-Player Matches in separate browser contexts: joining, leaving, returning, a second tab, Match full, Match not found, and a whole game to a Winner (with reduced motion, so it stays fast);
+- check a Turn's animation: the panel waits for it, the camera follows and returns, dragging stops it, a reload replays nothing, and reduced motion skips it.
+
+Screenshots go to `e2e/visual-output/`:
 
 ```sh
 pnpm dev        # in one terminal

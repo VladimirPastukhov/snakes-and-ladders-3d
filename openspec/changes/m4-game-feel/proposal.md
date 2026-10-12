@@ -6,7 +6,7 @@ M3 made the game playable, but a Turn happens in one frame: the Token teleports 
 
 ## What Changes
 
-- **Dice tumble:** after a Roll, a 3D die is thrown onto the Board beside the rolling Token. It tumbles for about a second and comes to rest with the rolled number facing up, on both screens.
+- **Dice tumble:** after a Roll, a 3D die drops onto the Board beside the rolling Token. It tumbles for about a second and comes to rest with the rolled number facing up, on both screens.
 - **Cell-by-cell hops:** the Token then hops along the road one Cell at a time, so a 4 is four visible hops. A Move that would pass the Final Cell stops there.
 - **Generic Jump flight:** when the Move ends on a Snake or Ladder, the Token flies along that Snake's or Ladder's glowing arc to its destination Cell. Ladders and Snakes look the same here; themed Jumps are M5.
 - **Follow camera:** during the animation the camera glides closer and follows the moving Token, then glides back to the whole-Board view. If a Player drags or zooms meanwhile, following stops for the rest of that Turn.

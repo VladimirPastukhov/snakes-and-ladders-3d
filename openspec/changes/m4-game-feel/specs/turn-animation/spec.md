@@ -7,7 +7,7 @@ Defines how a played Turn is shown on the Board: the die tumbling to the rolled 
 ## ADDED Requirements
 
 ### Requirement: A die tumbles to the rolled number
-After every Roll, both Players' screens SHALL show a 3D die thrown onto the Board beside the rolling Player's Token. It SHALL tumble for about one second and come to rest with the rolled number facing up and readable from the camera. The die SHALL start tumbling within 1 second of the Roll being requested.
+After every Roll, both Players' screens SHALL show a 3D die dropping onto the Board beside the rolling Player's Token. It SHALL tumble for about one second and come to rest with the rolled number facing up and readable from the camera. The die SHALL start tumbling within 1 second of the Roll being requested.
 
 #### Scenario: Alex rolls a 4
 - **WHEN** Alex presses Roll and the server decides 4
@@ -15,7 +15,7 @@ After every Roll, both Players' screens SHALL show a 3D die thrown onto the Boar
 
 #### Scenario: Die between Turns
 - **WHEN** a Turn's animation has finished
-- **THEN** the die stays at rest showing that Roll until the next Roll is thrown
+- **THEN** the die stays at rest showing that Roll until the next Roll
 
 ### Requirement: Tokens hop Cell by Cell
 After the die stops, the rolling Player's Token SHALL hop along the road one Cell at a time, one hop per Cell moved. A Move that would pass the Final Cell SHALL stop at the Final Cell, with no hops beyond it.

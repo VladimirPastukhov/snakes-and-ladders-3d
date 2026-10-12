@@ -77,11 +77,15 @@ test("two browser sessions meet in a Match and play two Turns", async ({ browser
   ] as const) {
     await expect(waiter.getByRole("button", { name: "Roll" })).toHaveCount(0);
     await roller.getByRole("button", { name: "Roll" }).click();
+    // Each screen reveals the result once its die, hops and any Jump have played (≤ 6 s).
     for (const page of [alex, sam]) {
-      await expect(page.getByTestId("last-turn")).toHaveText(new RegExp(`^${name} rolled [1-6]: `));
+      await expect(page.getByTestId("last-turn")).toHaveText(
+        new RegExp(`^${name} rolled [1-6]: `),
+        { timeout: 10_000 },
+      );
     }
-    await expect(waiter.getByTestId("turn")).toHaveText("Your Turn");
-    await expect(roller.getByTestId("turn")).toHaveText(`${next}'s Turn`);
+    await expect(waiter.getByTestId("turn")).toHaveText("Your Turn", { timeout: 10_000 });
+    await expect(roller.getByTestId("turn")).toHaveText(`${next}'s Turn`, { timeout: 10_000 });
   }
 
   await alexContext.close();

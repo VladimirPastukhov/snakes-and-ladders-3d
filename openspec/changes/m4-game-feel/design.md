@@ -68,7 +68,7 @@ The worst case is 900 + 6 × 280 + 150 + 900 = 3,630 ms, well under the 5 s limi
   - *Flight:* the flight is a quadratic Bézier from the landed spot to the destination spot, using the Snake's or Ladder's own arc peak as its control point, so the Token traces the drawn arc.
   - *Easing:* each segment eases in and out.
 - **`dieAt(timeline, t)`** returns the die's position and orientation.
-  - *Throw:* it is thrown from above the `from` Cell to a resting spot beside it, on the side away from the road's next Cell, so it never covers the hops.
+  - *Drop:* it falls from above the `from` Cell to a resting spot beside it, on the side away from the road's next Cell, so it never covers the hops.
   - *Spin:* during the tumble it spins about a fixed tilted axis with decaying speed, and the last 30% slerps into the resting orientation for the rolled value.
   - *Face table:* a table maps each value 1–6 to the rotation that puts that face up. A unit test checks the top face for every value.
 
@@ -84,8 +84,8 @@ After the timeline, both functions return the resting pose.
 
 ### Follow camera
 `CameraRig` gains a follow mode driven by `playing`:
-- **Follow target:** each frame, the orbit target eases (exponential damping) towards the midpoint of the moving Token and die.
-- **Follow distance:** the camera distance eases towards 0.55 × the overview distance, at the current polar and azimuth angles, so the follow view keeps the Player's chosen angle.
+- **Follow goal:** each frame, the rig frames the moving Token and the die (with some room around each) using `fitCamera` at the current polar and azimuth angles, so the follow view keeps the Player's chosen angle. The distance is never closer than 0.55 × the overview and never further than the overview: a short Move zooms right in, and a long Move pulls back just enough to keep both on screen.
+- **Easing:** the orbit target and distance ease towards that goal with exponential damping (rate 6/s), fast enough that a hopping Token is not left at the screen edge.
 - **Return:** when `playing` becomes null, the target and distance ease back to the overview fit, and following stops once it is reached.
 - **Player takes over:** OrbitControls' `start` event (the Player begins a drag or pinch) marks the current Turn as "taken over". The rig then stops following and does not return to the overview until the next Turn starts.
 - **Reduced motion:** the rig never enters follow mode.
@@ -97,6 +97,8 @@ After the timeline, both functions return the resting pose.
 - **When Roll is enabled:** `PlayControls` gets a `busy` flag (a Turn playing or queued), and Roll is enabled only when it is your Turn in `shown` and `!busy`.
 - **Fallback timer:** the 3-second retry fallback now watches the *latest* snapshot. A slow animation can then never re-enable Roll early, and a lost request still recovers.
 - **Keyboard:** Space and Enter follow the same `canRoll`.
+- **Steady panel height:** the Turn row is as tall as the Roll button whether or not the button is shown. Otherwise the canvas would resize every Turn, and a resize re-fits the camera, which would cut the glide back short and undo a Player's drag.
+- **Sharing per-frame state:** the moving Token's position, the die's position and the follow flag change every frame. They live in a ref shared by `TurnPlayer`, `CameraRig` and the debug hook, not in React state.
 
 ### Development hook
 `window.__board` gains:
