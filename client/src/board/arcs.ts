@@ -36,7 +36,7 @@ export function arcTop(arc: JumpArc): Vector3 {
 }
 
 /** Roughly how far apart the arrowheads along an arc are, in world units. */
-const ARROW_SPACING = 1.1;
+const ARROW_SPACING = 2.2;
 /** Arrowheads stay on this middle stretch of the arc, clear of both Cells. */
 const ARROW_SPAN = [0.15, 0.82] as const;
 
@@ -50,7 +50,7 @@ export interface Arrowhead {
 export function arrowheads(arc: JumpArc): Arrowhead[] {
   const [from, to] = ARROW_SPAN;
   const length = arc.curve.getLength() * (to - from);
-  const count = Math.max(2, Math.round(length / ARROW_SPACING));
+  const count = Math.max(1, Math.round(length / ARROW_SPACING));
   return Array.from({ length: count }, (_, i) => {
     const u = from + ((to - from) * (i + 0.5)) / count;
     return { position: arc.curve.getPointAt(u), direction: arc.curve.getTangentAt(u).normalize() };

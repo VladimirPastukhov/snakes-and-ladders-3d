@@ -10,7 +10,7 @@ describe("arrowheads", () => {
     "point along the arc %s towards its destination, evenly spaced, clear of both Cells",
     (_, arc) => {
       const heads = arrowheads(arc);
-      expect(heads.length).toBeGreaterThanOrEqual(2);
+      expect(heads.length).toBeGreaterThanOrEqual(1);
       const from = arc.curve.getPoint(0);
       const to = arc.curve.getPoint(1);
       for (const head of heads) {
