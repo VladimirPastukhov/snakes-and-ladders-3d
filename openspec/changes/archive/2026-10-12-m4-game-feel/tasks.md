@@ -69,7 +69,7 @@
 ## 7. Acceptance
 
 - [x] 7.1 Open the M4 pull request with the mid-animation screenshots from 5.1; verify CI is green
-- [ ] 7.2 Owner plays a Match between the computer and the phone on the local network. Verify that:
+- [x] 7.2 Owner plays a Match between the computer and the phone on the local network. Verify that:
   - the die tumbles and lands on the rolled number;
   - Tokens hop and fly along a Snake or Ladder;
   - the camera follows and returns, and dragging stops it;

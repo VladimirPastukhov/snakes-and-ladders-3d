@@ -22,7 +22,7 @@ Each Snake and Ladder SHALL be drawn as a glowing arc from its start Cell to its
 - **THEN** Cell 3 is ringed in the Ladder colour and Cell 11 is not ringed, so landing on 3 climbs and landing on 11 does nothing
 
 ### Requirement: Tokens appear for taken Seats
-The Board SHALL show a Token for each Seat that a Player holds: orange for the Match creator (Dorothy) and blue for the joiner (Scarecrow). Each Token SHALL stand on its Player's current Cell, or at Start before its first Move. When a Turn is played, the Token SHALL reach its new Cell through that Turn's animation; when the page opens or reconnects, Tokens SHALL appear straight on their current Cells. Two Tokens on the same Cell or both at Start SHALL stand side by side without overlapping. Outside a Match, the Board SHALL show no Tokens.
+The Board SHALL show a Token for each Seat that a Player holds: orange for the Match creator (Dorothy) and blue for the joiner (Scarecrow). Each Token SHALL stand on its Player's current Cell (Start before its first Move), reaching a new Cell through the Turn's animation, or straight away when the page opens or reconnects. Two Tokens on the same Cell or both at Start SHALL stand side by side without overlapping. Outside a Match, the Board SHALL show no Tokens.
 
 #### Scenario: Initial Board
 - **WHEN** the game page loads on the home screen, outside any Match
