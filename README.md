@@ -1,4 +1,5 @@
 # Simple online 3D game to learn OpenSpec framework
+
 Result: https://snakes-and-ladders-3d.podoknom.workers.dev/
 
 # Snakes & Ladders: The Yellow Brick Road
