@@ -1,3 +1,7 @@
+# Simple online 3D game to learn OpenSpec framework
+
+Result: https://snakes-and-ladders-3d.podoknom.workers.dev/
+
 # Snakes & Ladders: The Yellow Brick Road
 
 An online two-player 3D Snakes & Ladders game played in the browser, themed as the Yellow Brick Road from L. Frank Baum's _The Wonderful Wizard of Oz_ (1900).
